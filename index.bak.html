@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>La Maison des Piverts v5.4</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      :root {
+        --pivert: #2d5a27;
+        --bg: #f8f9fa;
+        --active: #fff9c4;
+        --reset: #6c757d;
+        --danger: #d93025;
+      }
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: var(--bg);
+        margin: 0;
+        padding: 15px;
+      }
+      .app-container {
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: var(--pivert);
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+      .input-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        position: relative;
+      }
+      input {
+        flex-grow: 1;
+        padding: 12px;
+        border: 1.5px solid #eee;
+        border-radius: 10px;
+        font-size: 16px;
+        outline: none;
+      }
+      .listening {
+        background-color: var(--active) !important;
+        border-color: #f4b400 !important;
+      }
+      .btn-vocal {
+        background: #f0f0f0;
+        border: none;
+        border-radius: 10px;
+        width: 50px;
+        cursor: pointer;
+        font-size: 20px;
+      }
+
+      /* Bouton Photo Amélioré */
+      .photo-btn-container {
+        flex-grow: 1;
+        position: relative;
+      }
+      #photo {
+        padding: 12px;
+        background: #f0f4f0;
+        border-radius: 10px;
+        border: 2px dashed var(--pivert);
+        width: 100%;
+        box-sizing: border-box;
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--pivert);
+        font-weight: bold;
+      }
+
+      .date-container {
+        position: relative;
+        flex-grow: 1;
+      }
+      .date-container::before {
+        content: "📅 Péremption";
+        position: absolute;
+        left: 12px;
+        top: -10px;
+        background: white;
+        padding: 0 5px;
+        font-size: 10px;
+        color: #888;
+        z-index: 1;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .btn-save {
+        flex: 3;
+        background: var(--pivert);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 18px;
+        cursor: pointer;
+      }
+      .btn-reset {
+        flex: 1;
+        background: var(--reset);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 20px;
+      }
+
+      .filter-group {
+        display: flex;
+        gap: 8px;
+        margin: 25px 0 15px 0;
+      }
+      select {
+        flex: 1;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        font-weight: bold;
+        color: var(--pivert);
+        background: white;
+      }
+
+      .item-card {
+        display: flex;
+        align-items: center;
+        background: white;
+        padding: 12px;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        border: 1px solid #f0f0f0;
+      }
+      .item-img {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        object-fit: cover;
+        margin-right: 12px;
+        border: 1px solid #eee;
+      }
+      .item-info {
+        flex-grow: 1;
+      }
+      .btn-del {
+        border: none;
+        background: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 10px;
+        color: var(--danger);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <h1>🪵🐦 La Maison des Piverts</h1>
+
+      <div class="input-row">
+        <input
+          type="text"
+          id="nom"
+          placeholder="Nom de l'objet"
+          list="list-noms"
+        />
+        <datalist id="list-noms"></datalist>
+        <button class="btn-vocal" onclick="vocal('nom')">🎤</button>
+      </div>
+      <div class="input-row">
+        <input
+          type="text"
+          id="lieu"
+          placeholder="Lieu (Cuisine, Garage...)"
+          list="list-lieux"
+        />
+        <datalist id="list-lieux"></datalist>
+        <button class="btn-vocal" onclick="vocal('lieu')">🎤</button>
+      </div>
+      <div class="input-row">
+        <input
+          type="text"
+          id="sous_lieu"
+          placeholder="Sous-lieu (Étagère...)"
+          list="list-sous-lieux"
+        />
+        <datalist id="list-sous-lieux"></datalist>
+        <button class="btn-vocal" onclick="vocal('sous_lieu')">🎤</button>
+      </div>
+
+      <div class="input-row">
+        <div class="date-container"><input type="date" id="date_p" /></div>
+        <div class="photo-btn-container">
+          <input
+            type="file"
+            id="photo"
+            accept="image/*"
+            capture="environment"
+          />
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-save" id="main-btn" onclick="ajouterOuModifier()">
+          Enregistrer
+        </button>
+        <button class="btn-reset" onclick="reinitialiser()">🔄</button>
+      </div>
+
+      <div class="filter-group">
+        <input
+          type="text"
+          id="search"
+          placeholder="🔍 Rechercher..."
+          onkeyup="chargerListe()"
+          style="
+            flex: 2;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding-left: 10px;
+          "
+        />
+        <select id="filtre-lieu" onchange="chargerListe()">
+          <option value="">Tous les lieux</option>
+        </select>
+      </div>
+
+      <div id="liste-objets"></div>
+    </div>
+
+    <script>
+      const SUPABASE_URL = "https://flrwnvtruxmrofamkegy.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_aZW6lNmcRo6tu8W5lWwMqw_cScLeyYu";
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      let idModification = null;
+
+      function vocal(id) {
+        const input = document.getElementById(id);
+        const rec = new (window.SpeechRecognition ||
+          window.webkitSpeechRecognition)();
+        rec.lang = "fr-FR";
+        rec.onstart = () => input.classList.add("listening");
+        rec.onresult = (e) => {
+          input.value = e.results[0][0].transcript;
+          input.classList.remove("listening");
+          chargerListe();
+        };
+        rec.onerror = () => input.classList.remove("listening");
+        rec.start();
+      }
+
+      function reinitialiser() {
+        idModification = null;
+        document.getElementById("nom").value = "";
+        document.getElementById("lieu").value = "";
+        document.getElementById("sous_lieu").value = "";
+        document.getElementById("date_p").value = "";
+        document.getElementById("photo").value = "";
+        const btn = document.getElementById("main-btn");
+        btn.innerHTML = "Enregistrer";
+        btn.style.background = "var(--pivert)";
+      }
+
+      async function ajouterOuModifier() {
+        const nom = document.getElementById("nom").value;
+        const lieu = document.getElementById("lieu").value;
+        const sous_lieu = document.getElementById("sous_lieu").value;
+        const date_p = document.getElementById("date_p").value || null;
+        const file = document.getElementById("photo").files[0];
+
+        if (!nom || !lieu) return alert("Nom et Lieu obligatoires !");
+
+        try {
+          let url = null;
+          if (file) {
+            const name = `${Date.now()}_${file.name}`;
+            await supabaseClient.storage.from("photos").upload(name, file);
+            url = supabaseClient.storage.from("photos").getPublicUrl(name)
+              .data.publicUrl;
+          }
+
+          const donnees = { nom, lieu, sous_lieu, date_peremption: date_p };
+          if (url) donnees.image_url = url;
+
+          if (idModification) {
+            await supabaseClient
+              .from("inventaire")
+              .update(donnees)
+              .eq("id", idModification);
+          } else {
+            await supabaseClient.from("inventaire").insert([donnees]);
+          }
+          reinitialiser();
+          chargerListe();
+        } catch (e) {
+          alert(e.message);
+        }
+      }
+
+      async function chargerListe() {
+        const s = document.getElementById("search").value;
+        const fLieu = document.getElementById("filtre-lieu").value;
+
+        let query = supabaseClient
+          .from("inventaire")
+          .select("*")
+          .ilike("nom", `%${s}%`);
+        if (fLieu) query = query.ilike("lieu", fLieu);
+
+        const { data } = await query.order("nom", { ascending: true });
+        if (!data) return;
+
+        const listNoms = document.getElementById("list-noms");
+        const listLieux = document.getElementById("list-lieux");
+        const listSousLieux = document.getElementById("list-sous-lieux");
+        const selectLieu = document.getElementById("filtre-lieu");
+
+        const nomsSet = new Set(),
+          lieuxSet = new Set(),
+          sousLieuxSet = new Set();
+        data.forEach((item) => {
+          nomsSet.add(item.nom);
+          lieuxSet.add(item.lieu.toUpperCase());
+          if (item.sous_lieu) sousLieuxSet.add(item.sous_lieu);
+        });
+
+        listNoms.innerHTML = [...nomsSet]
+          .map((n) => `<option value="${n}">`)
+          .join("");
+        listLieux.innerHTML = [...lieuxSet]
+          .map(
+            (l) => `<option value="${l.charAt(0) + l.slice(1).toLowerCase()}">`
+          )
+          .join("");
+        listSousLieux.innerHTML = [...sousLieuxSet]
+          .map((sl) => `<option value="${sl}">`)
+          .join("");
+
+        const currentFiltre = selectLieu.value;
+        selectLieu.innerHTML = '<option value="">Tous les lieux</option>';
+        [...lieuxSet].sort().forEach((l) => {
+          const label = l.charAt(0) + l.slice(1).toLowerCase();
+          selectLieu.add(new Option(label, l));
+        });
+        selectLieu.value = currentFiltre;
+
+        const container = document.getElementById("liste-objets");
+        container.innerHTML = data
+          .map(
+            (i) => `
+                <div class="item-card">
+                    <img class="item-img" src="${
+                      i.image_url || "https://via.placeholder.com/70?text=📦"
+                    }">
+                    <div class="item-info" onclick="preparerModif('${
+                      i.id
+                    }','${i.nom.replace(/'/g, "\\'")}','${i.lieu.replace(
+              /'/g,
+              "\\'"
+            )}','${(i.sous_lieu || "").replace(/'/g, "\\'")}','${
+              i.date_peremption || ""
+            }')">
+                        <strong>${i.nom}</strong>
+                        <small>📍 ${i.lieu} / ${i.sous_lieu || "-"}</small>
+                        ${
+                          i.date_peremption
+                            ? `<br><small>⌛ ${i.date_peremption
+                                .split("-")
+                                .reverse()
+                                .join("/")}</small>`
+                            : ""
+                        }
+                    </div>
+                    <button class="btn-del" onclick="supprimer('${
+                      i.id
+                    }', '${i.nom.replace(/'/g, "\\'")}')">🗑️</button>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function preparerModif(id, nom, lieu, sl, date) {
+        idModification = id;
+        document.getElementById("nom").value = nom;
+        document.getElementById("lieu").value = lieu;
+        document.getElementById("sous_lieu").value = sl;
+        document.getElementById("date_p").value = date;
+        const btn = document.getElementById("main-btn");
+        btn.innerHTML = "💾 Modifier";
+        btn.style.background = "#f4b400";
+        window.scrollTo(0, 0);
+      }
+
+      async function supprimer(id, nom) {
+        if (confirm("Voulez-vous supprimer l'objet : " + nom + " ?")) {
+          await supabaseClient.from("inventaire").delete().eq("id", id);
+          chargerListe();
+        }
+      }
+
+      chargerListe();
+    </script>
+  </body>
+</html>
