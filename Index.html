@@ -535,31 +535,6 @@
         box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
       }
 
-      .btn-vocal {
-        background-color: var(--input-bg);
-        border: 1.5px solid var(--border-color);
-        border-radius: 12px;
-        width: 52px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        font-size: 1.2rem;
-        color: var(--text-main);
-        transition: border-color 0.2s, background-color 0.2s;
-      }
-
-      .btn-vocal:hover {
-        background-color: var(--border-color);
-      }
-
-      .listening {
-        background-color: rgba(237, 137, 54, 0.15) !important;
-        border-color: var(--warning) !important;
-        color: var(--warning) !important;
-        animation: pulse 1.5s infinite;
-      }
-
       .file-upload {
         position: relative;
         display: inline-block;
@@ -698,6 +673,91 @@
           grid-template-columns: repeat(2, 1fr);
         }
       }
+
+      /* Toggle vue */
+      .vue-toggle {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .btn-vue {
+        background: var(--surface-color);
+        border: 1.5px solid var(--border-color);
+        border-radius: 8px;
+        padding: 7px 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        color: var(--text-muted);
+        transition: all 0.2s;
+      }
+      .btn-vue.active {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+      }
+
+      /* Grille produits */
+      .produits-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 4px 0;
+      }
+      @media (min-width: 600px) {
+        .produits-grid { grid-template-columns: repeat(3, 1fr); }
+      }
+      @media (min-width: 900px) {
+        .produits-grid { grid-template-columns: repeat(4, 1fr); }
+      }
+      .produit-card {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        aspect-ratio: 1 / 1;
+        background: var(--surface-color);
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .produit-card:hover { transform: scale(1.03); }
+      .produit-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .produit-card-no-img {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary) 0%, #1a3616 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+      }
+      .produit-card-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 6px 8px;
+        background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .produit-card-badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 20px;
+        font-weight: 700;
+      }
     </style>
   </head>
   <body>
@@ -733,6 +793,10 @@
         <select id="filtre-lieu" onchange="chargerListe()">
           <option value="">Tous les lieux</option>
         </select>
+        <div class="vue-toggle">
+          <button class="btn-vue active" id="btn-vue-liste" onclick="setVue('liste')" title="Vue liste">☰</button>
+          <button class="btn-vue" id="btn-vue-grille" onclick="setVue('grille')" title="Vue grille">⊞</button>
+        </div>
       </div>
 
       <div id="liste-objets"></div>
@@ -757,7 +821,6 @@
               list="list-noms"
             />
             <datalist id="list-noms"></datalist>
-            <button class="btn-vocal" onclick="vocal('nom')">🎤</button>
           </div>
         </div>
 
@@ -771,7 +834,6 @@
               list="list-lieux"
             />
             <datalist id="list-lieux"></datalist>
-            <button class="btn-vocal" onclick="vocal('lieu')">🎤</button>
           </div>
         </div>
 
@@ -785,7 +847,6 @@
               list="list-sous-lieux"
             />
             <datalist id="list-sous-lieux"></datalist>
-            <button class="btn-vocal" onclick="vocal('sous_lieu')">🎤</button>
           </div>
         </div>
 
@@ -828,6 +889,34 @@
       const SUPABASE_KEY = "sb_publishable_aZW6lNmcRo6tu8W5lWwMqw_cScLeyYu";
       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       let idModification = null;
+      let cachedInventaire = null;
+      let vueActuelle = 'liste';
+
+      function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      async function chargerDonnees(forceReload = false) {
+        if (cachedInventaire && !forceReload) return;
+        const { data } = await supabaseClient
+          .from("inventaire")
+          .select("*")
+          .order("nom", { ascending: true });
+        cachedInventaire = data || [];
+      }
+
+      async function recharger() {
+        await chargerDonnees(true);
+        chargerListe();
+      }
+
+      function setVue(mode) {
+        vueActuelle = mode;
+        document.getElementById('btn-vue-liste').classList.toggle('active', mode === 'liste');
+        document.getElementById('btn-vue-grille').classList.toggle('active', mode === 'grille');
+        chargerListe();
+      }
 
       function showToast(message) {
         const toast = document.getElementById("toast");
@@ -884,22 +973,7 @@
           label.style.borderColor = "var(--border-color)";
           label.style.color = "var(--text-muted)";
         }
-      }
-
-      function vocal(id) {
-        const input = document.getElementById(id);
-        const rec = new (window.SpeechRecognition ||
-          window.webkitSpeechRecognition)();
-        rec.lang = "fr-FR";
-        rec.onstart = () => input.classList.add("listening");
-        rec.onresult = (e) => {
-          input.value = e.results[0][0].transcript;
-          input.classList.remove("listening");
-          if (id === "nom" || id === "lieu") chargerListe();
-        };
-        rec.onerror = () => input.classList.remove("listening");
-        rec.start();
-      }
+      };
 
       function reinitialiser() {
         idModification = null;
@@ -957,7 +1031,7 @@
           }
 
           fermerModal();
-          chargerListe();
+          await recharger();
         } catch (e) {
           showToast("❌ Erreur : " + e.message);
         } finally {
@@ -967,22 +1041,27 @@
       }
 
       async function chargerListe() {
-        const s = document.getElementById("search").value;
+        await chargerDonnees();
+
+        const s = document.getElementById("search").value.trim().toLowerCase();
         const fLieu = document.getElementById("filtre-lieu").value;
 
-        let query = supabaseClient
-          .from("inventaire")
-          .select("*")
-          .ilike("nom", `%${s}%`);
+        let donnees = cachedInventaire;
 
-        const { data } = await query.order("nom", { ascending: true });
-        if (!data) return;
+        if (s) {
+          donnees = donnees.filter(item => item.nom.toLowerCase().includes(s));
+        }
+        if (fLieu) {
+          donnees = donnees.filter(item => item.lieu && item.lieu.toUpperCase() === fLieu.toUpperCase());
+        }
+
+        if (!donnees) return;
 
         const subtitle = document.getElementById("header-subtitle");
         if (subtitle) {
           subtitle.innerText =
-            data.length +
-            (data.length > 1 ? " objets répertoriés" : " objet répertorié");
+            cachedInventaire.length +
+            (cachedInventaire.length > 1 ? " objets répertoriés" : " objet répertorié");
         }
 
         const listNoms = document.getElementById("list-noms");
@@ -994,7 +1073,7 @@
           lieuxSet = new Set(),
           sousLieuxSet = new Set();
 
-        data.forEach((item) => {
+        cachedInventaire.forEach((item) => {
           nomsSet.add(item.nom);
           lieuxSet.add(item.lieu.toUpperCase());
           if (item.sous_lieu) sousLieuxSet.add(item.sous_lieu);
@@ -1028,7 +1107,7 @@
             '<div class="zones-grid">' +
             zones
               .map((zone, index) => {
-                const zoneItems = data.filter(
+                const zoneItems = cachedInventaire.filter(
                   (item) => item.lieu.toUpperCase() === zone
                 );
                 const count = zoneItems.length;
@@ -1080,12 +1159,6 @@
           return;
         }
 
-        const dataToDisplay = fLieu
-          ? data.filter(
-              (item) => item.lieu.toUpperCase() === fLieu.toUpperCase()
-            )
-          : data;
-
         let retourHtml = "";
         if (fLieu !== "" && s === "") {
           retourHtml = `
@@ -1094,9 +1167,31 @@
                 </div>`;
         }
 
+        if (vueActuelle === 'grille') {
+          container.innerHTML = retourHtml + '<div class="produits-grid">' + donnees.map(i => {
+            let badgeHtml = '';
+            if (i.date_peremption) {
+              const today = new Date(); today.setHours(0,0,0,0);
+              const exp = new Date(i.date_peremption);
+              const diff = Math.round((exp - today) / 86400000);
+              if (diff < 0) badgeHtml = `<span class="produit-card-badge" style="background:#e53e3e;color:#fff">Expiré</span>`;
+              else if (diff <= 30) badgeHtml = `<span class="produit-card-badge" style="background:#ed8936;color:#fff">${diff}j</span>`;
+            }
+            const imgHtml = i.image_url
+              ? `<img class="produit-card-img" src="${i.image_url}" loading="lazy" alt="${escHtml(i.nom)}">`
+              : `<div class="produit-card-no-img">📦</div>`;
+            return `<div class="produit-card" onclick="preparerModif('${i.id}','${escHtml(i.nom)}','${escHtml(i.lieu)}','${escHtml(i.sous_lieu||'')}','${i.date_peremption||''}')">
+              ${imgHtml}
+              ${badgeHtml}
+              <div class="produit-card-label">${escHtml(i.nom)}</div>
+            </div>`;
+          }).join('') + '</div>';
+          return;
+        }
+
         container.innerHTML =
           retourHtml +
-          dataToDisplay
+          donnees
             .map((i) => {
               const bgStyle = i.image_url
                 ? `background-image: url('${i.image_url}');`
@@ -1180,7 +1275,7 @@
           try {
             await supabaseClient.from("inventaire").delete().eq("id", id);
             showToast("🗑️ Objet supprimé !");
-            chargerListe();
+            await recharger();
           } catch (e) {
             showToast("❌ Erreur lors de la suppression.");
           }
