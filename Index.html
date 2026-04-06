@@ -270,9 +270,7 @@
         position: relative;
         border-radius: 16px;
         margin-bottom: 20px;
-        min-height: 140px;
-        background-size: cover;
-        background-position: center;
+        min-height: 80px;
         box-shadow: var(--shadow-sm);
         border: 1px solid var(--border-color);
         overflow: visible;
@@ -301,39 +299,25 @@
       }
 
       .badge-peremption {
-        position: absolute;
-        top: -10px;
-        left: -10px;
-        padding: 6px 12px;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        font-weight: 800;
+        display: inline-block;
+        margin-left: auto;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.68rem;
+        font-weight: 600;
         color: white;
-        z-index: 4;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
+        white-space: nowrap;
       }
 
       .badge-warning {
-        background: linear-gradient(135deg, #f6ad55 0%, #dd6b20 100%);
+        background: rgba(214, 99, 18, 0.9);
+        color: #fff !important;
       }
 
       .badge-danger {
-        background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
-        animation: pulse-danger 2s infinite;
-      }
-
-      @keyframes pulse-danger {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-        100% {
-          transform: scale(1);
-        }
+        background: rgba(197, 48, 48, 0.9);
+        color: #fff !important;
       }
 
       .item-info {
@@ -343,14 +327,14 @@
         width: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
+        justify-content: center;
         cursor: pointer;
         border-radius: 16px;
       }
 
-      .item-info * {
-        color: #ffffff !important;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      .item-info *:not(.badge-peremption) {
+        color: var(--text-main) !important;
+        text-shadow: none;
       }
 
       .item-nom {
@@ -367,39 +351,66 @@
         gap: 5px;
       }
 
-      .item-date {
-        font-size: 0.85rem;
-        margin-top: 5px;
+      .item-meta {
         display: flex;
         align-items: center;
-        gap: 5px;
-        color: #ffd27f !important;
+        gap: 10px;
+        margin-top: 5px;
+        flex-wrap: wrap;
+      }
+
+      .item-qty {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        background: var(--bg-color);
+        padding: 1px 7px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+      }
+
+      .item-date {
+        font-size: 0.8rem;
+        color: var(--warning);
       }
 
       .btn-del {
         position: absolute;
-        top: 12px;
-        right: 12px;
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
         z-index: 3;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(4px);
-        border: none;
+        background: transparent;
+        border: 1px solid rgba(197, 48, 48, 0.2);
         color: var(--danger);
-        font-size: 1.1rem;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transition: transform 0.2s, background 0.2s;
+        opacity: 0.6;
+        transition: opacity 0.2s, background 0.2s, border-color 0.2s;
       }
 
       .btn-del:hover {
-        transform: scale(1.1);
-        background: #ffffff;
+        opacity: 1;
+        background: rgba(197, 48, 48, 0.08);
+        border-color: rgba(197, 48, 48, 0.5);
+        transform: translateY(-50%);
+      }
+
+      .produit-card {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      .produit-card.pressing {
+        opacity: 0.6;
+        transform: scale(0.95);
+        transition: opacity 0.1s, transform 0.1s;
+        outline: 2px solid var(--danger);
       }
 
       .fab {
@@ -751,12 +762,126 @@
       }
       .produit-card-badge {
         position: absolute;
-        top: 6px;
-        right: 6px;
-        font-size: 0.65rem;
-        padding: 2px 6px;
+        top: 7px;
+        right: 7px;
+        font-size: 0.67rem;
+        padding: 3px 8px;
         border-radius: 20px;
-        font-weight: 700;
+        font-weight: 600;
+        color: white;
+        letter-spacing: 0.3px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+
+      .produit-card-badge.badge-danger { background: rgba(197, 48, 48, 0.88); }
+      .produit-card-badge.badge-warning { background: rgba(214, 99, 18, 0.88); }
+      /* ---- NOTIFICATIONS ---- */
+      .btn-notif {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: var(--header-text);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background 0.2s, transform 0.2s;
+        margin-right: 8px;
+      }
+      .btn-notif:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.05); }
+      .btn-notif.active { background: rgba(255, 200, 0, 0.3); }
+
+      .notif-panel {
+        position: fixed;
+        top: 0; right: 0; bottom: 0;
+        width: min(340px, 100vw);
+        background: var(--surface-color);
+        box-shadow: -4px 0 20px rgba(0,0,0,0.2);
+        z-index: 1001;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .notif-panel.open { transform: translateX(0); }
+      .notif-panel-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 1000;
+        display: none;
+      }
+      .notif-panel-overlay.open { display: block; }
+      .notif-panel-header {
+        padding: 16px;
+        background: var(--header-bg);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .notif-panel-header h3 { font-size: 1rem; font-weight: 600; margin: 0; }
+      .notif-panel-close {
+        background: none; border: none; color: white;
+        font-size: 1.4rem; cursor: pointer; padding: 4px 8px;
+        border-radius: 6px;
+      }
+      .notif-panel-close:hover { background: rgba(255,255,255,0.2); }
+      .notif-panel-body { padding: 16px; overflow-y: auto; flex: 1; }
+      .notif-status {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px; border-radius: 10px;
+        background: var(--bg-color); margin-bottom: 16px;
+        font-size: 0.9rem; color: var(--text-main);
+      }
+      .notif-status-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: #ccc; flex-shrink: 0;
+      }
+      .notif-status-dot.granted { background: #48bb78; }
+      .notif-status-dot.denied { background: #e53e3e; }
+      .notif-seuil-row {
+        display: flex; align-items: center; gap: 8px;
+        margin-bottom: 16px; font-size: 0.9rem; color: var(--text-main);
+      }
+      .notif-seuil-row input {
+        width: 60px; padding: 6px 8px; border-radius: 8px;
+        border: 1px solid var(--border-color); background: var(--input-bg);
+        color: var(--text-main); font-size: 0.9rem; text-align: center;
+      }
+      .btn-notif-activer {
+        width: 100%; padding: 12px; border-radius: 10px;
+        background: var(--primary); color: white; font-size: 0.95rem;
+        font-weight: 600; border: none; cursor: pointer; margin-bottom: 12px;
+        transition: background 0.2s;
+      }
+      .btn-notif-activer:hover { background: var(--primary-hover); }
+      .btn-notif-check {
+        width: 100%; padding: 10px; border-radius: 10px;
+        background: transparent; color: var(--primary); font-size: 0.9rem;
+        font-weight: 600; border: 2px solid var(--primary); cursor: pointer;
+        margin-bottom: 16px; transition: background 0.2s;
+      }
+      .btn-notif-check:hover { background: var(--primary); color: white; }
+      .notif-item-card {
+        padding: 10px 12px; border-radius: 10px; margin-bottom: 8px;
+        font-size: 0.85rem; border-left: 4px solid;
+      }
+      .notif-item-card.expire { border-color: #e53e3e; background: rgba(229,62,62,0.08); }
+      .notif-item-card.bientot { border-color: #ed8936; background: rgba(237,137,54,0.08); }
+      .notif-item-name { font-weight: 600; color: var(--text-main); }
+      .notif-item-date { color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; }
+      .notif-empty { text-align: center; color: var(--text-muted); padding: 20px 0; font-size: 0.9rem; }
+      .notif-section-title {
+        font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+        color: var(--text-muted); margin: 12px 0 6px; letter-spacing: 0.05em;
       }
     </style>
   </head>
@@ -776,11 +901,39 @@
             >
           </div>
         </div>
+        <button class="btn-notif" id="btn-notif" onclick="ouvrirPanelNotif()" title="Notifications de péremption">🔔</button>
         <button class="theme-toggle" onclick="toggleTheme()" id="theme-icon">
           🌙
         </button>
       </div>
     </header>
+
+    <!-- Panel notifications -->
+    <div class="notif-panel-overlay" id="notif-overlay" onclick="fermerPanelNotif()"></div>
+    <div class="notif-panel" id="notif-panel">
+      <div class="notif-panel-header">
+        <h3>🔔 Notifications</h3>
+        <button class="notif-panel-close" onclick="fermerPanelNotif()">×</button>
+      </div>
+      <div class="notif-panel-body">
+        <div class="notif-status">
+          <div class="notif-status-dot" id="notif-dot"></div>
+          <span id="notif-status-text">Vérification...</span>
+        </div>
+        <div class="notif-seuil-row">
+          <span>M'alerter</span>
+          <input type="number" id="notif-seuil" min="1" max="90" value="7" onchange="sauvegarderSeuil()" />
+          <span>jours avant péremption</span>
+        </div>
+        <button class="btn-notif-activer" id="btn-activer-notif" onclick="activerNotifications()">
+          Activer les notifications
+        </button>
+        <button class="btn-notif-check" onclick="verifierPeremptions(false)">
+          🔍 Vérifier maintenant
+        </button>
+        <div id="notif-items-container"></div>
+      </div>
+    </div>
 
     <div class="container">
       <div class="search-bar">
@@ -794,15 +947,15 @@
           <option value="">Tous les lieux</option>
         </select>
         <div class="vue-toggle">
-          <button class="btn-vue active" id="btn-vue-liste" onclick="setVue('liste')" title="Vue liste">☰</button>
-          <button class="btn-vue" id="btn-vue-grille" onclick="setVue('grille')" title="Vue grille">⊞</button>
+          <button class="btn-vue" id="btn-vue-liste" onclick="setVue('liste')" title="Vue liste">☰</button>
+          <button class="btn-vue active" id="btn-vue-grille" onclick="setVue('grille')" title="Vue grille">⊞</button>
         </div>
       </div>
 
       <div id="liste-objets"></div>
     </div>
 
-    <button class="fab" onclick="ouvrirModal()">+</button>
+    <button class="fab" onclick="nouveauProduit()">+</button>
 
     <div class="modal-overlay" id="modal" onclick="fermerModal(event)">
       <div class="modal-content" onclick="event.stopPropagation()">
@@ -851,6 +1004,13 @@
         </div>
 
         <div class="input-group">
+          <label>Quantité</label>
+          <div class="input-wrapper">
+            <input type="number" id="quantite" min="1" value="1" />
+          </div>
+        </div>
+
+        <div class="input-group">
           <label>Date de péremption (optionnel)</label>
           <div class="input-wrapper">
             <input type="date" id="date_p" />
@@ -890,7 +1050,8 @@
       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       let idModification = null;
       let cachedInventaire = null;
-      let vueActuelle = 'liste';
+      let vueActuelle = 'grille';
+      let fSousLieu = "";
 
       function escHtml(str) {
         if (!str) return '';
@@ -944,6 +1105,18 @@
           savedTheme === "light" ? "🌙" : "☀️";
       }
 
+      function nouveauProduit() {
+        reinitialiser();
+        const fLieu = document.getElementById("filtre-lieu").value;
+        if (fLieu) {
+          document.getElementById("lieu").value = fLieu.charAt(0).toUpperCase() + fLieu.slice(1).toLowerCase();
+        }
+        if (fSousLieu && fSousLieu !== "__all__") {
+          document.getElementById("sous_lieu").value = fSousLieu;
+        }
+        ouvrirModal();
+      }
+
       function ouvrirModal() {
         document.getElementById("modal").classList.add("active");
         document.body.style.overflow = "hidden";
@@ -981,6 +1154,7 @@
         document.getElementById("lieu").value = "";
         document.getElementById("sous_lieu").value = "";
         document.getElementById("date_p").value = "";
+        document.getElementById("quantite").value = "1";
         document.getElementById("photo").value = "";
         document.getElementById("modal-title").innerText = "Nouvel objet";
 
@@ -995,6 +1169,7 @@
         const lieu = document.getElementById("lieu").value;
         const sous_lieu = document.getElementById("sous_lieu").value;
         const date_p = document.getElementById("date_p").value || null;
+        const quantite = parseInt(document.getElementById("quantite").value) || 1;
         const file = document.getElementById("photo").files[0];
 
         if (!nom || !lieu) {
@@ -1016,7 +1191,7 @@
               .data.publicUrl;
           }
 
-          const donnees = { nom, lieu, sous_lieu, date_peremption: date_p };
+          const donnees = { nom, lieu, sous_lieu, date_peremption: date_p, quantite };
           if (url) donnees.image_url = url;
 
           if (idModification) {
@@ -1049,10 +1224,14 @@
         let donnees = cachedInventaire;
 
         if (s) {
-          donnees = donnees.filter(item => item.nom.toLowerCase().includes(s));
+          const norm = t => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          donnees = donnees.filter(item => norm(item.nom).includes(norm(s)));
         }
         if (fLieu) {
           donnees = donnees.filter(item => item.lieu && item.lieu.toUpperCase() === fLieu.toUpperCase());
+        }
+        if (fSousLieu && fSousLieu !== "__all__") {
+          donnees = donnees.filter(item => item.sous_lieu && item.sous_lieu.toLowerCase() === fSousLieu.toLowerCase());
         }
 
         if (!donnees) return;
@@ -1159,12 +1338,54 @@
           return;
         }
 
+        if (s === "" && fLieu !== "" && !fSousLieu) {
+          const sousLieux = [...new Set(
+            cachedInventaire
+              .filter(i => i.lieu.toUpperCase() === fLieu.toUpperCase() && i.sous_lieu)
+              .map(i => i.sous_lieu)
+          )].sort();
+
+          if (sousLieux.length > 0) {
+            const totalZone = cachedInventaire.filter(i => i.lieu.toUpperCase() === fLieu.toUpperCase()).length;
+            const slIcons = sl => {
+              const l = sl.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              if (l.includes("frigo") || l.includes("refrigerateur")) return "❄️";
+              if (l.includes("congelateur")) return "🧊";
+              if (l.includes("placard")) return "🚪";
+              if (l.includes("tiroir")) return "🗂️";
+              if (l.includes("etagere")) return "📚";
+              if (l.includes("cave")) return "🍷";
+              if (l.includes("garde manger") || l.includes("garde-manger")) return "🥫";
+              return "📦";
+            };
+            container.innerHTML =
+              `<div class="btn-retour" onclick="filtrerParZone('')">⬅️ Retour aux zones</div>` +
+              `<div class="zones-grid">` +
+              `<div class="zone-card" onclick="filtrerParSousLieu('__all__')">
+                <span class="zone-icon">📋</span>
+                <span class="zone-title">Tout voir</span>
+                <span class="zone-count">${totalZone} objet${totalZone > 1 ? "s" : ""}</span>
+              </div>` +
+              sousLieux.map(sl => {
+                const count = cachedInventaire.filter(i => i.lieu.toUpperCase() === fLieu.toUpperCase() && i.sous_lieu === sl).length;
+                return `<div class="zone-card" onclick="filtrerParSousLieu('${sl.replace(/'/g, "\\'")}')">
+                  <span class="zone-icon">${slIcons(sl)}</span>
+                  <span class="zone-title">${sl}</span>
+                  <span class="zone-count">${count} objet${count > 1 ? "s" : ""}</span>
+                </div>`;
+              }).join("") +
+              `</div>`;
+            return;
+          }
+        }
+
         let retourHtml = "";
         if (fLieu !== "" && s === "") {
-          retourHtml = `
-                <div class="btn-retour" onclick="filtrerParZone('')">
-                    ⬅️ Retour aux zones
-                </div>`;
+          if (fSousLieu) {
+            retourHtml = `<div class="btn-retour" onclick="filtrerParSousLieu('')">⬅️ Retour aux sous-lieux</div>`;
+          } else {
+            retourHtml = `<div class="btn-retour" onclick="filtrerParZone('')">⬅️ Retour aux zones</div>`;
+          }
         }
 
         if (vueActuelle === 'grille') {
@@ -1174,18 +1395,25 @@
               const today = new Date(); today.setHours(0,0,0,0);
               const exp = new Date(i.date_peremption);
               const diff = Math.round((exp - today) / 86400000);
-              if (diff < 0) badgeHtml = `<span class="produit-card-badge" style="background:#e53e3e;color:#fff">Expiré</span>`;
-              else if (diff <= 30) badgeHtml = `<span class="produit-card-badge" style="background:#ed8936;color:#fff">${diff}j</span>`;
+              if (diff < 0) badgeHtml = `<span class="produit-card-badge badge-danger">Expiré</span>`;
+              else if (diff <= 30) badgeHtml = `<span class="produit-card-badge badge-warning">J-${diff}</span>`;
             }
             const imgHtml = i.image_url
               ? `<img class="produit-card-img" src="${i.image_url}" loading="lazy" alt="${escHtml(i.nom)}">`
               : `<div class="produit-card-no-img">📦</div>`;
-            return `<div class="produit-card" onclick="preparerModif('${i.id}','${escHtml(i.nom)}','${escHtml(i.lieu)}','${escHtml(i.sous_lieu||'')}','${i.date_peremption||''}')">
+            return `<div class="produit-card"
+              data-id="${i.id}"
+              data-nom="${escHtml(i.nom)}"
+              data-lieu="${escHtml(i.lieu)}"
+              data-sl="${escHtml(i.sous_lieu||'')}"
+              data-date="${i.date_peremption||''}"
+              data-quantite="${i.quantite||1}">
               ${imgHtml}
               ${badgeHtml}
               <div class="produit-card-label">${escHtml(i.nom)}</div>
             </div>`;
           }).join('') + '</div>';
+          attachGridEvents();
           return;
         }
 
@@ -1193,9 +1421,7 @@
           retourHtml +
           donnees
             .map((i) => {
-              const bgStyle = i.image_url
-                ? `background-image: url('${i.image_url}');`
-                : `background: linear-gradient(135deg, var(--primary) 0%, #1a3616 100%);`;
+              const bgStyle = `background: var(--surface-color);`;
 
               let badgeHtml = "";
               if (i.date_peremption) {
@@ -1206,44 +1432,67 @@
                 const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
 
                 if (diffDays < 0) {
-                  badgeHtml = `<div class="badge-peremption badge-danger">⚠️ Expiré</div>`;
+                  badgeHtml = `<div class="badge-peremption badge-danger">Expiré</div>`;
                 } else if (diffDays <= 7) {
-                  badgeHtml = `<div class="badge-peremption badge-warning">⏳ J-${diffDays}</div>`;
+                  badgeHtml = `<div class="badge-peremption badge-warning">J-${diffDays}</div>`;
                 }
               }
 
+              const qty = i.quantite || 1;
               return `
                 <div class="item-card" style="${bgStyle}">
-                    ${badgeHtml}
-                    <div class="item-card-overlay"></div>
-                    <div class="item-info" onclick="preparerModif('${
-                      i.id
-                    }','${i.nom.replace(/'/g, "\\'")}','${i.lieu.replace(
-                /'/g,
-                "\\'"
-              )}','${(i.sous_lieu || "").replace(/'/g, "\\'")}','${
-                i.date_peremption || ""
-              }')">
+                    <div class="item-info" onclick="preparerModif('${i.id}','${i.nom.replace(/'/g,"\\'")}','${i.lieu.replace(/'/g,"\\'")}','${(i.sous_lieu||'').replace(/'/g,"\\'")}','${i.date_peremption||''}',${qty})">
                         <div class="item-nom">${i.nom}</div>
-                        <div class="item-loc">📍 ${i.lieu} ${
-                i.sous_lieu ? `> ${i.sous_lieu}` : ""
-              }</div>
-                        ${
-                          i.date_peremption
-                            ? `<div class="item-date">⌛ Expire le : ${i.date_peremption
-                                .split("-")
-                                .reverse()
-                                .join("/")}</div>`
-                            : ""
-                        }
+                        <div class="item-loc">📍 ${i.lieu} ${i.sous_lieu ? `> ${i.sous_lieu}` : ""}</div>
+                        <div class="item-meta">
+                          <span class="item-qty">×${qty}</span>
+                          ${i.date_peremption ? `<span class="item-date">Expire le ${i.date_peremption.split("-").reverse().join("/")}</span>` : ""}
+                          ${badgeHtml}
+                        </div>
                     </div>
-                    <button class="btn-del" onclick="supprimer(event, '${
-                      i.id
-                    }', '${i.nom.replace(/'/g, "\\'")}')">🗑️</button>
+                    <button class="btn-del" onclick="supprimer(event, '${i.id}', '${i.nom.replace(/'/g, "\\'")}')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/><path d="M10,11v6"/><path d="M14,11v6"/><path d="M9,6V4h6v2"/></svg>
+                    </button>
                 </div>
                 `;
             })
             .join("");
+      }
+
+      let _longPressTimer = null;
+      let _longPressTriggered = false;
+
+      function attachGridEvents() {
+        document.querySelectorAll(".produit-card").forEach((el) => {
+          const { id, nom, lieu, sl, date, quantite } = el.dataset;
+
+          const startPress = () => {
+            _longPressTriggered = false;
+            el.classList.add("pressing");
+            _longPressTimer = setTimeout(() => {
+              _longPressTriggered = true;
+              el.classList.remove("pressing");
+              if (navigator.vibrate) navigator.vibrate(60);
+              supprimer({ stopPropagation: () => {} }, id, nom);
+            }, 600);
+          };
+
+          const cancelPress = () => {
+            clearTimeout(_longPressTimer);
+            el.classList.remove("pressing");
+          };
+
+          el.addEventListener("touchstart", startPress, { passive: true });
+          el.addEventListener("touchend", cancelPress);
+          el.addEventListener("touchmove", cancelPress);
+          el.addEventListener("mousedown", startPress);
+          el.addEventListener("mouseup", cancelPress);
+          el.addEventListener("mouseleave", cancelPress);
+          el.addEventListener("click", () => {
+            if (_longPressTriggered) { _longPressTriggered = false; return; }
+            preparerModif(id, nom, lieu, sl, date, quantite);
+          });
+        });
       }
 
       function filtrerParZone(zone) {
@@ -1251,15 +1500,22 @@
         document.getElementById("lieu").value = zone
           ? zone.charAt(0).toUpperCase() + zone.slice(1).toLowerCase()
           : "";
+        fSousLieu = "";
         chargerListe();
       }
 
-      function preparerModif(id, nom, lieu, sl, date) {
+      function filtrerParSousLieu(sl) {
+        fSousLieu = sl;
+        chargerListe();
+      }
+
+      function preparerModif(id, nom, lieu, sl, date, quantite) {
         idModification = id;
         document.getElementById("nom").value = nom;
         document.getElementById("lieu").value = lieu;
         document.getElementById("sous_lieu").value = sl;
         document.getElementById("date_p").value = date;
+        document.getElementById("quantite").value = quantite || 1;
 
         document.getElementById("modal-title").innerText = "Modifier l'objet";
         const btn = document.getElementById("main-btn");
@@ -1284,6 +1540,209 @@
 
       loadTheme();
       chargerListe();
+
+      // ---- NOTIFICATIONS DE PÉREMPTION ----
+      const VAPID_PUBLIC = 'BGiwV75qIldzegVA3UlJpovjYZ9mKlSXOjLp9jn9hkuM82ZC1m1Gan1UaeIwAP9mDZCqQaKtJsRdTDboDfRY818';
+      const NOTIF_SEUIL_KEY = 'notif_seuil_pivert';
+      const NOTIF_LAST_KEY = 'notif_last_pivert';
+
+      function getSeuilNotif() {
+        return parseInt(localStorage.getItem(NOTIF_SEUIL_KEY) || '7', 10);
+      }
+
+      function sauvegarderSeuil() {
+        const val = parseInt(document.getElementById('notif-seuil').value, 10);
+        if (val > 0) localStorage.setItem(NOTIF_SEUIL_KEY, val);
+      }
+
+      function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const raw = atob(base64);
+        return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+      }
+
+      async function initNotifications() {
+        // Charger le seuil sauvegardé
+        const seuil = getSeuilNotif();
+        document.getElementById('notif-seuil').value = seuil;
+
+        // Enregistrer le service worker
+        if ('serviceWorker' in navigator) {
+          try {
+            await navigator.serviceWorker.register('./sw.js');
+          } catch(e) { console.warn('SW:', e); }
+        }
+
+        majStatutNotif();
+
+        // Vérification automatique une fois par jour si autorisé
+        if (Notification.permission === 'granted') {
+          const lastCheck = localStorage.getItem(NOTIF_LAST_KEY);
+          const today = new Date().toDateString();
+          if (lastCheck !== today) {
+            localStorage.setItem(NOTIF_LAST_KEY, today);
+            await verifierPeremptions(true);
+          }
+        }
+      }
+
+      function majStatutNotif() {
+        const dot = document.getElementById('notif-dot');
+        const txt = document.getElementById('notif-status-text');
+        const btn = document.getElementById('btn-activer-notif');
+        const bellBtn = document.getElementById('btn-notif');
+
+        if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+          dot.className = 'notif-status-dot denied';
+          txt.textContent = 'Non supporté par ce navigateur';
+          btn.disabled = true;
+          return;
+        }
+
+        if (Notification.permission === 'granted') {
+          dot.className = 'notif-status-dot granted';
+          txt.textContent = 'Notifications activées ✓';
+          btn.textContent = '✓ Activées — Réabonner';
+          bellBtn.classList.add('active');
+        } else if (Notification.permission === 'denied') {
+          dot.className = 'notif-status-dot denied';
+          txt.textContent = 'Bloquées — activez dans les réglages du navigateur';
+          btn.textContent = 'Bloquées par le navigateur';
+          btn.disabled = true;
+        } else {
+          dot.className = 'notif-status-dot';
+          txt.textContent = 'Notifications désactivées';
+          btn.textContent = '🔔 Activer les notifications';
+          btn.disabled = false;
+        }
+      }
+
+      async function activerNotifications() {
+        if (!('Notification' in window)) {
+          showToast('❌ Non supporté sur ce navigateur');
+          return;
+        }
+
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          showToast('❌ Permission refusée');
+          majStatutNotif();
+          return;
+        }
+
+        // S'abonner aux push notifications
+        try {
+          const sw = await navigator.serviceWorker.ready;
+          const subscription = await sw.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
+          });
+
+          // Sauvegarder l'abonnement dans Supabase
+          const { endpoint, keys } = subscription.toJSON();
+          const { error } = await supabaseClient
+            .from('push_subscriptions')
+            .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth }, { onConflict: 'endpoint' });
+
+          if (error) throw error;
+          showToast('✅ Notifications activées !');
+          await verifierPeremptions(false);
+        } catch(e) {
+          showToast('❌ Erreur abonnement : ' + e.message);
+        }
+
+        majStatutNotif();
+      }
+
+      function ouvrirPanelNotif() {
+        document.getElementById('notif-panel').classList.add('open');
+        document.getElementById('notif-overlay').classList.add('open');
+        majStatutNotif();
+      }
+
+      function fermerPanelNotif() {
+        document.getElementById('notif-panel').classList.remove('open');
+        document.getElementById('notif-overlay').classList.remove('open');
+      }
+
+      async function verifierPeremptions(silencieux = false) {
+        await chargerDonnees();
+        if (!cachedInventaire || cachedInventaire.length === 0) {
+          if (!silencieux) afficherResultatsNotif([], []);
+          return;
+        }
+
+        const seuil = getSeuilNotif();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const expires = [], bientot = [];
+
+        cachedInventaire.forEach(item => {
+          if (!item.date_peremption) return;
+          const exp = new Date(item.date_peremption);
+          const diff = Math.round((exp - today) / 86400000);
+          if (diff < 0) expires.push({ ...item, diff });
+          else if (diff <= seuil) bientot.push({ ...item, diff });
+        });
+
+        if (!silencieux) afficherResultatsNotif(expires, bientot);
+
+        // Notification système si au moins 1 objet à signaler
+        const total = expires.length + bientot.length;
+        if (total === 0 || Notification.permission !== 'granted') return;
+
+        const titre = `⚠️ ${total} objet${total > 1 ? 's' : ''} à vérifier`;
+        const lignes = [];
+        if (expires.length) lignes.push(`Expirés : ${expires.slice(0, 3).map(i => i.nom).join(', ')}`);
+        if (bientot.length) lignes.push(`Bientôt : ${bientot.slice(0, 3).map(i => `${i.nom} (J-${i.diff})`).join(', ')}`);
+
+        try {
+          const sw = await navigator.serviceWorker.ready;
+          sw.showNotification(titre, {
+            body: lignes.join('\n'),
+            icon: './pivert.png',
+            badge: './pivert.png',
+            tag: 'peremption-pivert',
+            renotify: true,
+            vibrate: [200, 100, 200]
+          });
+        } catch(e) { console.warn('Notif:', e); }
+      }
+
+      function afficherResultatsNotif(expires, bientot) {
+        const container = document.getElementById('notif-items-container');
+        if (expires.length === 0 && bientot.length === 0) {
+          container.innerHTML = '<div class="notif-empty">✅ Aucun objet à signaler</div>';
+          return;
+        }
+
+        let html = '';
+        if (expires.length > 0) {
+          html += '<div class="notif-section-title">🔴 Expirés</div>';
+          expires.forEach(item => {
+            const d = new Date(item.date_peremption).toLocaleDateString('fr-FR');
+            html += `<div class="notif-item-card expire">
+              <div class="notif-item-name">${escHtml(item.nom)}</div>
+              <div class="notif-item-date">Expiré depuis le ${d} · ${escHtml(item.lieu)}</div>
+            </div>`;
+          });
+        }
+        if (bientot.length > 0) {
+          html += '<div class="notif-section-title">🟠 Expire bientôt</div>';
+          bientot.forEach(item => {
+            const d = new Date(item.date_peremption).toLocaleDateString('fr-FR');
+            html += `<div class="notif-item-card bientot">
+              <div class="notif-item-name">${escHtml(item.nom)} <span style="color:var(--warning)">J-${item.diff}</span></div>
+              <div class="notif-item-date">Expire le ${d} · ${escHtml(item.lieu)}</div>
+            </div>`;
+          });
+        }
+        container.innerHTML = html;
+      }
+
+      initNotifications();
     </script>
   </body>
 </html>
