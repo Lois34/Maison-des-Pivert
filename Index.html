@@ -2041,28 +2041,11 @@
         const m = now.getMinutes();
 
         // Horloge en temps réel
-        const timeStr = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-        document.getElementById('lessive-heure').textContent = timeStr;
+        document.getElementById('lessive-heure').textContent =
+          `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 
-        const container = document.getElementById('lessive-result');
-        const enCreuse = h >= 22 || h < 6;
-
-        if (!enCreuse) {
-          // Calcul du temps avant 22h
-          const minUntil22 = (22 - h) * 60 - m;
-          const hh = Math.floor(minUntil22 / 60);
-          const mm = minUntil22 % 60;
-          const countdownStr = hh > 0 ? `${hh}h${mm > 0 ? String(mm).padStart(2,'0') : ''}` : `${mm} min`;
-          container.innerHTML = `
-            <div class="lessive-result-box hors-creuse">
-              <div class="lessive-result-label">Pas encore en heures creuses</div>
-              <div class="lessive-result-hours" style="font-size:3rem">${countdownStr}</div>
-              <div class="lessive-result-sub">avant 22h00 — revenez ce soir !</div>
-            </div>`;
-          return;
-        }
-
-        // Minutes exactes jusqu'à 6h00
+        // Minutes exactes jusqu'au prochain 6h00
+        // Si on est avant 6h : c'est ce matin. Sinon : c'est demain matin.
         let minUntil6;
         if (h < 6) {
           minUntil6 = (6 - h) * 60 - m;
@@ -2070,19 +2053,23 @@
           minUntil6 = (24 - h) * 60 - m + 6 * 60;
         }
 
-        const heuresExactes = minUntil6 / 60;
-        const hFloor = Math.floor(heuresExactes);
+        const hFloor = Math.floor(minUntil6 / 60);
         const mRest = minUntil6 % 60;
-        const hCeil = Math.ceil(heuresExactes); // ce qu'on programme sur la machine
+        const hCeil = Math.ceil(minUntil6 / 60);
 
         const dureeStr = mRest === 0 ? `${hFloor}h pile` : `${hFloor}h ${mRest} min`;
+        const enCreuse = h >= 22 || h < 6;
+        const contextMsg = enCreuse
+          ? `✅ Vous êtes en heures creuses`
+          : `💡 Tarif creuses à partir de 22h`;
         const arrondiMsg = mRest > 0
           ? `Arrondi à l'heure sup. pour finir <em>avant</em> 6h`
           : `La machine finira <em>exactement</em> à 6h00`;
 
-        container.innerHTML = `
-          <div class="lessive-result-box">
-            <div class="lessive-result-label">Programmez votre machine sur</div>
+        document.getElementById('lessive-result').innerHTML = `
+          <div class="lessive-result-box${enCreuse ? '' : ' hors-creuse'}">
+            <div class="lessive-result-label">${contextMsg}</div>
+            <div class="lessive-result-label" style="margin-top:8px">Programmez votre machine sur</div>
             <div class="lessive-result-hours">${hCeil}h</div>
             <div class="lessive-result-sub">
               Durée exacte : <strong>${dureeStr}</strong><br>
