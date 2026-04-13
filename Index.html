@@ -58,7 +58,7 @@
         background-color: var(--bg-color);
         color: var(--text-main);
         -webkit-font-smoothing: antialiased;
-        padding-bottom: 80px;
+        padding-bottom: 130px;
       }
 
       .main-header {
@@ -776,6 +776,252 @@
 
       .produit-card-badge.badge-danger { background: rgba(197, 48, 48, 0.88); }
       .produit-card-badge.badge-warning { background: rgba(214, 99, 18, 0.88); }
+
+      /* ===== BOTTOM NAV ===== */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--surface-color);
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        z-index: 500;
+      }
+
+      .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 0 14px;
+        gap: 4px;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-weight: 600;
+        border: none;
+        background: transparent;
+        position: relative;
+        transition: color 0.2s;
+      }
+
+      .nav-item.active {
+        color: var(--primary);
+      }
+
+      .nav-icon {
+        font-size: 1.4rem;
+        line-height: 1;
+      }
+
+      .nav-badge {
+        position: absolute;
+        top: 7px;
+        right: calc(50% - 22px);
+        background: var(--danger);
+        color: white;
+        border-radius: 10px;
+        padding: 1px 5px;
+        font-size: 0.6rem;
+        font-weight: 700;
+        min-width: 16px;
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      /* ===== LISTE DE COURSES ===== */
+      .courses-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 0 2px;
+      }
+
+      .courses-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-main);
+      }
+
+      .courses-progress {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 3px;
+      }
+
+      .btn-reset-courses {
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 9px 14px;
+        border-radius: 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+
+      .btn-reset-courses:hover {
+        background: var(--border-color);
+        color: var(--text-main);
+      }
+
+      .courses-group-header {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        padding: 14px 4px 7px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 8px;
+      }
+
+      .courses-group-header:first-child {
+        padding-top: 0;
+      }
+
+      .course-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--surface-color);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        transition: all 0.25s;
+      }
+
+      .course-item.achete {
+        opacity: 0.45;
+        background: var(--bg-color);
+      }
+
+      .course-checkbox {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 2px solid var(--border-color);
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 0.2s;
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .course-checkbox.checked {
+        background: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .course-info {
+        flex: 1;
+        min-width: 0;
+        cursor: pointer;
+      }
+
+      .course-nom {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-main);
+        transition: all 0.2s;
+      }
+
+      .course-item.achete .course-nom {
+        text-decoration: line-through;
+        color: var(--text-muted);
+      }
+
+      .course-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 5px;
+        flex-wrap: wrap;
+      }
+
+      .course-qty {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        background: var(--bg-color);
+        padding: 1px 7px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+      }
+
+      .course-magasin {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--primary);
+        background: rgba(45, 90, 39, 0.08);
+        padding: 2px 9px;
+        border-radius: 10px;
+        border: 1px solid rgba(45, 90, 39, 0.15);
+      }
+
+      [data-theme="dark"] .course-magasin {
+        background: rgba(72, 187, 120, 0.12);
+        border-color: rgba(72, 187, 120, 0.25);
+      }
+
+      .course-btn-del {
+        background: transparent;
+        border: 1px solid rgba(197, 48, 48, 0.2);
+        color: var(--danger);
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0.55;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+
+      .course-btn-del:hover {
+        opacity: 1;
+        background: rgba(197, 48, 48, 0.08);
+        border-color: rgba(197, 48, 48, 0.5);
+      }
+
+      .courses-empty {
+        text-align: center;
+        padding: 55px 20px;
+        color: var(--text-muted);
+      }
+
+      .courses-empty .empty-icon {
+        font-size: 3.2rem;
+        display: block;
+        margin-bottom: 14px;
+      }
+
+      .courses-empty .empty-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      .courses-empty .empty-sub {
+        font-size: 0.875rem;
+        margin-top: 6px;
+        font-weight: 400;
+      }
     </style>
   </head>
   <body>
@@ -800,27 +1046,96 @@
       </div>
     </header>
 
-    <div class="container">
-      <div class="search-bar">
-        <input
-          type="text"
-          id="search"
-          placeholder="🔍 Rechercher un objet..."
-          onkeyup="chargerListe()"
-        />
-        <select id="filtre-lieu" onchange="chargerListe()">
-          <option value="">Tous les lieux</option>
-        </select>
-        <div class="vue-toggle">
-          <button class="btn-vue" id="btn-vue-liste" onclick="setVue('liste')" title="Vue liste">☰</button>
-          <button class="btn-vue active" id="btn-vue-grille" onclick="setVue('grille')" title="Vue grille">⊞</button>
+    <!-- Section Inventaire -->
+    <div id="section-inventaire">
+      <div class="container">
+        <div class="search-bar">
+          <input
+            type="text"
+            id="search"
+            placeholder="🔍 Rechercher un objet..."
+            onkeyup="chargerListe()"
+          />
+          <select id="filtre-lieu" onchange="chargerListe()">
+            <option value="">Tous les lieux</option>
+          </select>
+          <div class="vue-toggle">
+            <button class="btn-vue" id="btn-vue-liste" onclick="setVue('liste')" title="Vue liste">☰</button>
+            <button class="btn-vue active" id="btn-vue-grille" onclick="setVue('grille')" title="Vue grille">⊞</button>
+          </div>
         </div>
-      </div>
 
-      <div id="liste-objets"></div>
+        <div id="liste-objets"></div>
+      </div>
     </div>
 
-    <button class="fab" onclick="nouveauProduit()">+</button>
+    <!-- Section Courses -->
+    <div id="section-courses" style="display:none">
+      <div class="container">
+        <div class="courses-header">
+          <div>
+            <div class="courses-title">🛒 Liste de courses</div>
+            <div id="courses-progress" class="courses-progress"></div>
+          </div>
+          <button class="btn-reset-courses" onclick="reinitialiserCourses()">↺ Tout décocher</button>
+        </div>
+        <div id="liste-courses"></div>
+      </div>
+    </div>
+
+    <!-- FAB contextuel -->
+    <button class="fab" id="fab-btn" onclick="nouveauProduitOuCourse()">+</button>
+
+    <!-- Modal Courses -->
+    <div class="modal-overlay" id="modal-course" onclick="fermerModalCourse(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2 id="modal-course-title">Ajouter un article</h2>
+          <button class="btn-close" onclick="fermerModalCourse()">×</button>
+        </div>
+
+        <div class="input-group">
+          <label>Article</label>
+          <div class="input-wrapper">
+            <input type="text" id="course-nom" placeholder="Ex: Lait, Pain..." list="list-course-noms" autocomplete="off" />
+            <datalist id="list-course-noms"></datalist>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Quantité</label>
+          <div class="input-wrapper">
+            <input type="number" id="course-quantite" min="1" value="1" />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Magasin (optionnel)</label>
+          <div class="input-wrapper">
+            <input type="text" id="course-magasin" placeholder="Ex: Leclerc, Lidl..." list="list-magasins" autocomplete="off" />
+            <datalist id="list-magasins"></datalist>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalCourse()">Annuler</button>
+          <button class="btn-save" id="course-btn" onclick="ajouterCourse()">🛒 Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation basse -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" id="nav-inventaire" onclick="switchTab('inventaire')">
+        <span class="nav-icon">📦</span>
+        Inventaire
+      </button>
+      <button class="nav-item" id="nav-courses" onclick="switchTab('courses')">
+        <span class="nav-icon">🛒</span>
+        <span id="nav-courses-badge" class="nav-badge" style="display:none">0</span>
+        Courses
+      </button>
+    </nav>
 
     <div class="modal-overlay" id="modal" onclick="fermerModal(event)">
       <div class="modal-content" onclick="event.stopPropagation()">
@@ -1402,6 +1717,208 @@
           }
         }
       }
+
+      // ===== LISTE DE COURSES =====
+      let tabActuel = 'inventaire';
+      let cachedCourses = null;
+      let idModifCourse = null;
+
+      function switchTab(tab) {
+        tabActuel = tab;
+        document.getElementById('section-inventaire').style.display = tab === 'inventaire' ? '' : 'none';
+        document.getElementById('section-courses').style.display = tab === 'courses' ? '' : 'none';
+        document.getElementById('nav-inventaire').classList.toggle('active', tab === 'inventaire');
+        document.getElementById('nav-courses').classList.toggle('active', tab === 'courses');
+        if (tab === 'courses') chargerCourses(true);
+      }
+
+      function nouveauProduitOuCourse() {
+        if (tabActuel === 'inventaire') nouveauProduit();
+        else ouvrirModalCourse();
+      }
+
+      function ouvrirModalCourse() {
+        idModifCourse = null;
+        document.getElementById('course-nom').value = '';
+        document.getElementById('course-quantite').value = '1';
+        document.getElementById('course-magasin').value = '';
+        document.getElementById('modal-course-title').innerText = 'Ajouter un article';
+        document.getElementById('course-btn').innerHTML = '🛒 Ajouter';
+        document.getElementById('course-btn').className = 'btn-save';
+        document.getElementById('modal-course').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => document.getElementById('course-nom').focus(), 100);
+      }
+
+      function fermerModalCourse(e) {
+        if (e && e.target !== document.getElementById('modal-course') && e.type === 'click') return;
+        document.getElementById('modal-course').classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+
+      async function chargerCourses(forceReload = false) {
+        if (cachedCourses && !forceReload) { afficherCourses(); return; }
+        const { data } = await supabaseClient
+          .from('liste_courses')
+          .select('*')
+          .order('achete', { ascending: true })
+          .order('created_at', { ascending: true });
+        cachedCourses = data || [];
+        afficherCourses();
+        updateCoursesBadge();
+      }
+
+      function afficherCourses() {
+        const container = document.getElementById('liste-courses');
+        const progressEl = document.getElementById('courses-progress');
+        if (!cachedCourses || cachedCourses.length === 0) {
+          container.innerHTML = `<div class="courses-empty">
+            <span class="empty-icon">🛒</span>
+            <div class="empty-title">La liste est vide !</div>
+            <div class="empty-sub">Appuyez sur + pour ajouter un article</div>
+          </div>`;
+          if (progressEl) progressEl.innerText = '';
+          return;
+        }
+        const total = cachedCourses.length;
+        const achetes = cachedCourses.filter(c => c.achete).length;
+        if (progressEl) progressEl.innerText = `${achetes} / ${total} article${total > 1 ? 's' : ''} acheté${achetes > 1 ? 's' : ''}`;
+
+        // Alimenter datalist magasins
+        const magasinsSet = new Set(cachedCourses.filter(c => c.magasin).map(c => c.magasin));
+        const listMagasins = document.getElementById('list-magasins');
+        if (listMagasins) listMagasins.innerHTML = [...magasinsSet].map(m => `<option value="${escHtml(m)}">`).join('');
+        const listNomsCourse = document.getElementById('list-course-noms');
+        if (listNomsCourse) listNomsCourse.innerHTML = [...new Set(cachedCourses.map(c => c.nom))].map(n => `<option value="${escHtml(n)}">`).join('');
+
+        // Grouper par magasin (sans magasin en premier)
+        const parMagasin = {};
+        cachedCourses.forEach(c => {
+          const key = c.magasin || '';
+          if (!parMagasin[key]) parMagasin[key] = [];
+          parMagasin[key].push(c);
+        });
+        const keys = Object.keys(parMagasin).sort((a, b) => {
+          if (a === '') return -1;
+          if (b === '') return 1;
+          return a.localeCompare(b, 'fr');
+        });
+
+        let html = '';
+        keys.forEach(magasin => {
+          if (magasin) html += `<div class="courses-group-header">🏪 ${escHtml(magasin)}</div>`;
+          parMagasin[magasin].forEach(c => { html += renderCourseItem(c); });
+        });
+        container.innerHTML = html;
+      }
+
+      function renderCourseItem(c) {
+        const acheClass = c.achete ? 'achete' : '';
+        const checkedClass = c.achete ? 'checked' : '';
+        const checkIcon = c.achete ? '✓' : '';
+        const magasinBadge = c.magasin ? `<span class="course-magasin">🏪 ${escHtml(c.magasin)}</span>` : '';
+        const nomEsc = c.nom.replace(/'/g, "\\'");
+        return `<div class="course-item ${acheClass}">
+          <div class="course-checkbox ${checkedClass}" onclick="toggleAchete('${c.id}', ${c.achete})">${checkIcon}</div>
+          <div class="course-info" onclick="preparerModifCourse('${c.id}')">
+            <div class="course-nom">${escHtml(c.nom)}</div>
+            <div class="course-meta">
+              <span class="course-qty">×${c.quantite || 1}</span>
+              ${magasinBadge}
+            </div>
+          </div>
+          <button class="course-btn-del" onclick="supprimerCourse('${c.id}', '${nomEsc}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/><path d="M10,11v6"/><path d="M14,11v6"/><path d="M9,6V4h6v2"/></svg>
+          </button>
+        </div>`;
+      }
+
+      async function toggleAchete(id, currentVal) {
+        const newVal = !currentVal;
+        await supabaseClient.from('liste_courses').update({ achete: newVal }).eq('id', id);
+        if (cachedCourses) {
+          const item = cachedCourses.find(c => c.id === id);
+          if (item) item.achete = newVal;
+        }
+        afficherCourses();
+        updateCoursesBadge();
+      }
+
+      async function ajouterCourse() {
+        const nom = document.getElementById('course-nom').value.trim();
+        const quantite = parseInt(document.getElementById('course-quantite').value) || 1;
+        const magasin = document.getElementById('course-magasin').value.trim() || null;
+        if (!nom) { showToast("⚠️ Le nom de l'article est obligatoire !"); return; }
+
+        const btn = document.getElementById('course-btn');
+        const btnText = btn.innerHTML;
+        btn.innerHTML = '⏳ En cours...';
+        btn.disabled = true;
+        try {
+          if (idModifCourse) {
+            await supabaseClient.from('liste_courses').update({ nom, quantite, magasin }).eq('id', idModifCourse);
+            showToast('✅ Article modifié !');
+          } else {
+            await supabaseClient.from('liste_courses').insert([{ nom, quantite, magasin, achete: false }]);
+            showToast('✅ Article ajouté à la liste !');
+          }
+          fermerModalCourse();
+          await chargerCourses(true);
+        } catch (e) {
+          showToast('❌ Erreur : ' + e.message);
+        } finally {
+          btn.innerHTML = btnText;
+          btn.disabled = false;
+        }
+      }
+
+      function preparerModifCourse(id) {
+        const item = cachedCourses && cachedCourses.find(c => c.id === id);
+        if (!item) return;
+        idModifCourse = id;
+        document.getElementById('course-nom').value = item.nom;
+        document.getElementById('course-quantite').value = item.quantite || 1;
+        document.getElementById('course-magasin').value = item.magasin || '';
+        document.getElementById('modal-course-title').innerText = "Modifier l'article";
+        const btn = document.getElementById('course-btn');
+        btn.innerHTML = '🔄 Mettre à jour';
+        btn.className = 'btn-save edit-mode';
+        document.getElementById('modal-course').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      async function supprimerCourse(id, nom) {
+        if (confirm('Supprimer "' + nom + '" de la liste ?')) {
+          await supabaseClient.from('liste_courses').delete().eq('id', id);
+          showToast('🗑️ Article supprimé');
+          await chargerCourses(true);
+        }
+      }
+
+      async function reinitialiserCourses() {
+        const restants = cachedCourses ? cachedCourses.filter(c => c.achete).length : 0;
+        if (restants === 0) { showToast('ℹ️ Aucun article coché'); return; }
+        if (!confirm('Décocher tous les articles achetés ?')) return;
+        await supabaseClient.from('liste_courses').update({ achete: false }).eq('achete', true);
+        await chargerCourses(true);
+        showToast('✅ Liste réinitialisée !');
+      }
+
+      function updateCoursesBadge() {
+        const badge = document.getElementById('nav-courses-badge');
+        if (!badge || !cachedCourses) return;
+        const restants = cachedCourses.filter(c => !c.achete).length;
+        badge.style.display = restants > 0 ? '' : 'none';
+        badge.innerText = restants;
+      }
+
+      // Synchronisation temps réel — toute la famille voit les changements instantanément
+      supabaseClient
+        .channel('liste_courses_realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'liste_courses' }, async () => {
+          await chargerCourses(true);
+        })
+        .subscribe();
 
       loadTheme();
       chargerListe();
