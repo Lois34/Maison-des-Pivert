@@ -1423,7 +1423,7 @@
           <div class="lessive-info-title">Comment ça marche ?</div>
           En heures creuses (22h–6h), l'électricité est moins chère. Ce calculateur
           indique le délai à programmer sur la machine à laver pour qu'elle se
-          termine <strong>exactement à 6h du matin</strong>.
+          termine <strong>au plus près de 6h du matin</strong>.
         </div>
       </div>
     </div>
@@ -2479,6 +2479,7 @@
       loadTheme();
       chargerListe();
       initNotifications();
+      chargerCourses(true); // badge visible dès le démarrage
     </script>
   </body>
 </html>
