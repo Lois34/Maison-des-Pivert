@@ -2063,14 +2063,14 @@
           ? `✅ Vous êtes en heures creuses`
           : `💡 Tarif creuses à partir de 22h`;
         const arrondiMsg = mRest > 0
-          ? `Arrondi à l'heure sup. pour finir <em>avant</em> 6h`
-          : `La machine finira <em>exactement</em> à 6h00`;
+          ? `Arrondi à l'heure inf. — finira entre 5h et 6h ✓`
+          : `La machine finira <em>exactement</em> à 6h00 ✓`;
 
         document.getElementById('lessive-result').innerHTML = `
           <div class="lessive-result-box${enCreuse ? '' : ' hors-creuse'}">
             <div class="lessive-result-label">${contextMsg}</div>
             <div class="lessive-result-label" style="margin-top:8px">Programmez votre machine sur</div>
-            <div class="lessive-result-hours">${hCeil}h</div>
+            <div class="lessive-result-hours">${hFloor}h</div>
             <div class="lessive-result-sub">
               Durée exacte : <strong>${dureeStr}</strong><br>
               ${arrondiMsg}
