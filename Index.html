@@ -2152,7 +2152,7 @@
           .from('liste_courses')
           .select('*')
           .order('achete', { ascending: true })
-          .order('created_at', { ascending: true });
+          .order('nom', { ascending: true });
         cachedCourses = data || [];
         afficherCourses();
         updateCoursesBadge();
