@@ -1027,6 +1027,119 @@
         font-weight: 400;
       }
 
+      /* ===== SECTION LESSIVE ===== */
+      .lessive-card {
+        background: var(--surface-color);
+        border-radius: 24px;
+        padding: 32px 24px 28px;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        margin-bottom: 18px;
+      }
+
+      .lessive-icon {
+        font-size: 3.2rem;
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      .lessive-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 4px;
+      }
+
+      .lessive-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-bottom: 28px;
+      }
+
+      .lessive-clock {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 24px;
+      }
+
+      .lessive-clock-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      .lessive-clock-time {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -1px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .lessive-result-box {
+        background: linear-gradient(135deg, var(--primary) 0%, #1e3f1a 100%);
+        border-radius: 20px;
+        padding: 28px 20px 22px;
+        margin-bottom: 20px;
+        color: white;
+      }
+
+      .lessive-result-box.hors-creuse {
+        background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+      }
+
+      .lessive-result-label {
+        font-size: 0.85rem;
+        opacity: 0.85;
+        font-weight: 500;
+        margin-bottom: 10px;
+        letter-spacing: 0.2px;
+      }
+
+      .lessive-result-hours {
+        font-size: 5rem;
+        font-weight: 900;
+        letter-spacing: -3px;
+        line-height: 1;
+        margin-bottom: 10px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .lessive-result-sub {
+        font-size: 0.82rem;
+        opacity: 0.8;
+        line-height: 1.5;
+      }
+
+      .lessive-result-sub strong {
+        opacity: 1;
+        font-size: 0.9rem;
+      }
+
+      .lessive-info {
+        background: var(--surface-color);
+        border-radius: 16px;
+        padding: 16px 18px;
+        border: 1px solid var(--border-color);
+        font-size: 0.86rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        text-align: left;
+      }
+
+      .lessive-info-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+
       /* ===== BOUTON "AJOUTER À LA LISTE" DANS MODAL INVENTAIRE ===== */
       .btn-add-to-courses {
         width: 100%;
@@ -1290,6 +1403,31 @@
       </div>
     </div>
 
+    <!-- Section Lessive -->
+    <div id="section-lessive" style="display:none">
+      <div class="container" style="padding-top:15px">
+        <div class="lessive-card">
+          <span class="lessive-icon">🧺</span>
+          <div class="lessive-title">Minuterie heures creuses</div>
+          <div class="lessive-subtitle">Tarif réduit de 22h à 6h du matin</div>
+
+          <div class="lessive-clock">
+            <span class="lessive-clock-label">Il est</span>
+            <span class="lessive-clock-time" id="lessive-heure">--:--</span>
+          </div>
+
+          <div id="lessive-result"></div>
+        </div>
+
+        <div class="lessive-info">
+          <div class="lessive-info-title">Comment ça marche ?</div>
+          En heures creuses (22h–6h), l'électricité est moins chère. Ce calculateur
+          indique le délai à programmer sur la machine à laver pour qu'elle se
+          termine <strong>exactement à 6h du matin</strong>.
+        </div>
+      </div>
+    </div>
+
     <!-- Navigation basse -->
     <nav class="bottom-nav">
       <button class="nav-item active" id="nav-inventaire" onclick="switchTab('inventaire')">
@@ -1300,6 +1438,10 @@
         <span class="nav-icon">🛒</span>
         <span id="nav-courses-badge" class="nav-badge" style="display:none">0</span>
         Courses
+      </button>
+      <button class="nav-item" id="nav-lessive" onclick="switchTab('lessive')">
+        <span class="nav-icon">🧺</span>
+        Lessive
       </button>
     </nav>
 
@@ -1892,6 +2034,63 @@
         }
       }
 
+      // ===== MINUTERIE HEURES CREUSES =====
+      function calculerLessive() {
+        const now = new Date();
+        const h = now.getHours();
+        const m = now.getMinutes();
+
+        // Horloge en temps réel
+        const timeStr = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        document.getElementById('lessive-heure').textContent = timeStr;
+
+        const container = document.getElementById('lessive-result');
+        const enCreuse = h >= 22 || h < 6;
+
+        if (!enCreuse) {
+          // Calcul du temps avant 22h
+          const minUntil22 = (22 - h) * 60 - m;
+          const hh = Math.floor(minUntil22 / 60);
+          const mm = minUntil22 % 60;
+          const countdownStr = hh > 0 ? `${hh}h${mm > 0 ? String(mm).padStart(2,'0') : ''}` : `${mm} min`;
+          container.innerHTML = `
+            <div class="lessive-result-box hors-creuse">
+              <div class="lessive-result-label">Pas encore en heures creuses</div>
+              <div class="lessive-result-hours" style="font-size:3rem">${countdownStr}</div>
+              <div class="lessive-result-sub">avant 22h00 — revenez ce soir !</div>
+            </div>`;
+          return;
+        }
+
+        // Minutes exactes jusqu'à 6h00
+        let minUntil6;
+        if (h < 6) {
+          minUntil6 = (6 - h) * 60 - m;
+        } else {
+          minUntil6 = (24 - h) * 60 - m + 6 * 60;
+        }
+
+        const heuresExactes = minUntil6 / 60;
+        const hFloor = Math.floor(heuresExactes);
+        const mRest = minUntil6 % 60;
+        const hCeil = Math.ceil(heuresExactes); // ce qu'on programme sur la machine
+
+        const dureeStr = mRest === 0 ? `${hFloor}h pile` : `${hFloor}h ${mRest} min`;
+        const arrondiMsg = mRest > 0
+          ? `Arrondi à l'heure sup. pour finir <em>avant</em> 6h`
+          : `La machine finira <em>exactement</em> à 6h00`;
+
+        container.innerHTML = `
+          <div class="lessive-result-box">
+            <div class="lessive-result-label">Programmez votre machine sur</div>
+            <div class="lessive-result-hours">${hCeil}h</div>
+            <div class="lessive-result-sub">
+              Durée exacte : <strong>${dureeStr}</strong><br>
+              ${arrondiMsg}
+            </div>
+          </div>`;
+      }
+
       // ===== AJOUTER À LA LISTE DE COURSES DEPUIS L'INVENTAIRE =====
       async function ajouterDepuisInventaire() {
         const nom = document.getElementById("nom").value.trim();
@@ -1911,13 +2110,29 @@
       let cachedCourses = null;
       let idModifCourse = null;
 
+      let lessiveInterval = null;
+
       function switchTab(tab) {
         tabActuel = tab;
         document.getElementById('section-inventaire').style.display = tab === 'inventaire' ? '' : 'none';
         document.getElementById('section-courses').style.display = tab === 'courses' ? '' : 'none';
+        document.getElementById('section-lessive').style.display = tab === 'lessive' ? '' : 'none';
         document.getElementById('nav-inventaire').classList.toggle('active', tab === 'inventaire');
         document.getElementById('nav-courses').classList.toggle('active', tab === 'courses');
-        if (tab === 'courses') chargerCourses(true);
+        document.getElementById('nav-lessive').classList.toggle('active', tab === 'lessive');
+
+        // FAB masqué sur l'onglet Lessive (pas d'ajout pertinent)
+        document.getElementById('fab-btn').style.display = tab === 'lessive' ? 'none' : '';
+
+        if (tab === 'courses') {
+          chargerCourses(true);
+        } else if (tab === 'lessive') {
+          calculerLessive();
+          clearInterval(lessiveInterval);
+          lessiveInterval = setInterval(calculerLessive, 10000);
+        } else {
+          clearInterval(lessiveInterval);
+        }
       }
 
       function nouveauProduitOuCourse() {
