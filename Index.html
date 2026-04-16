@@ -1695,7 +1695,33 @@
     <script>
       const SUPABASE_URL = "https://flrwnvtruxmrofamkegy.supabase.co";
       const SUPABASE_KEY = "sb_publishable_aZW6lNmcRo6tu8W5lWwMqw_cScLeyYu";
-      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // Stockage cookie : partagé entre Safari et la PWA iOS (contrairement au localStorage)
+      function cookieStorage() {
+        return {
+          getItem(key) {
+            const k = encodeURIComponent(key) + '=';
+            const row = document.cookie.split('; ').find(r => r.startsWith(k));
+            return row ? decodeURIComponent(row.slice(k.length)) : null;
+          },
+          setItem(key, value) {
+            const exp = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+            document.cookie = `${encodeURIComponent(key)}=${encodeURIComponent(value)}; expires=${exp}; path=/; SameSite=Lax`;
+          },
+          removeItem(key) {
+            document.cookie = `${encodeURIComponent(key)}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+          }
+        };
+      }
+
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+          storage: cookieStorage(),
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+        }
+      });
 
       // ===== AUTHENTIFICATION =====
       let currentUser = null;
