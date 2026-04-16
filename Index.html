@@ -1382,18 +1382,47 @@
       <div class="login-card">
         <div class="login-logo">🐦</div>
         <div class="login-title">La Maison des Piverts</div>
-        <div class="login-subtitle">Entrez votre email pour recevoir<br>votre lien de connexion</div>
-        <input
-          type="email"
-          id="login-email"
-          class="login-input"
-          placeholder="votre@email.com"
-          autocomplete="email"
-          onkeydown="if(event.key==='Enter') envoyerMagicLink()"
-        />
-        <button class="login-btn" id="login-btn" onclick="envoyerMagicLink()">
-          Envoyer le lien magique ✉️
-        </button>
+
+        <!-- Étape 1 : saisie email -->
+        <div id="login-step1">
+          <div class="login-subtitle">Entrez votre email pour recevoir<br>un code de connexion à 6 chiffres</div>
+          <input
+            type="email"
+            id="login-email"
+            class="login-input"
+            placeholder="votre@email.com"
+            autocomplete="email"
+            onkeydown="if(event.key==='Enter') envoyerMagicLink()"
+          />
+          <button class="login-btn" id="login-btn" onclick="envoyerMagicLink()">
+            Envoyer le code ✉️
+          </button>
+        </div>
+
+        <!-- Étape 2 : saisie du code OTP -->
+        <div id="login-step2" style="display:none">
+          <div class="login-subtitle">Code envoyé !<br>Entrez les 6 chiffres reçus par email.</div>
+          <input
+            type="text"
+            id="login-code"
+            class="login-input"
+            placeholder="123456"
+            maxlength="6"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            style="text-align:center; font-size:1.6rem; letter-spacing:8px; font-weight:700;"
+            onkeydown="if(event.key==='Enter') verifierCode()"
+          />
+          <button class="login-btn" id="verify-btn" onclick="verifierCode()">
+            Se connecter ✓
+          </button>
+          <button
+            onclick="document.getElementById('login-step1').style.display='';document.getElementById('login-step2').style.display='none';document.getElementById('login-message').className='login-message';"
+            style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;margin-top:12px;display:block;width:100%;">
+            ← Changer d'email
+          </button>
+        </div>
+
         <div class="login-message" id="login-message"></div>
       </div>
     </div>
@@ -1414,7 +1443,6 @@
           </div>
         </div>
         <button class="btn-notif" id="btn-notif" onclick="ouvrirPanelNotif()" title="Notifications de péremption">🔔</button>
-        <button class="btn-logout" onclick="seDeconnecter()" title="Se déconnecter">🚪</button>
         <button class="theme-toggle" onclick="toggleTheme()" id="theme-icon">
           🌙
         </button>
@@ -1445,6 +1473,9 @@
           🔍 Vérifier maintenant
         </button>
         <div id="notif-items-container"></div>
+        <button onclick="seDeconnecter()" style="width:100%;margin-top:24px;padding:10px;border-radius:10px;border:1px solid var(--border-color);background:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">
+          🚪 Se déconnecter
+        </button>
       </div>
     </div>
 
@@ -1686,6 +1717,8 @@
         }
       });
 
+      let _loginEmail = '';
+
       async function envoyerMagicLink() {
         const email = document.getElementById('login-email').value.trim();
         const btn = document.getElementById('login-btn');
@@ -1701,21 +1734,50 @@
         btn.textContent = 'Envoi en cours…';
         msg.className = 'login-message';
 
-        const { error } = await supabaseClient.auth.signInWithOtp({
-          email,
-          options: { emailRedirectTo: window.location.origin + window.location.pathname }
-        });
+        const { error } = await supabaseClient.auth.signInWithOtp({ email });
 
         if (error) {
           msg.textContent = 'Erreur : ' + error.message;
           msg.className = 'login-message error';
           btn.disabled = false;
-          btn.textContent = 'Envoyer le lien magique ✉️';
+          btn.textContent = 'Envoyer le code ✉️';
         } else {
-          msg.innerHTML = '✓ Lien envoyé !<br>Vérifiez votre boîte mail et cliquez sur le lien.';
-          msg.className = 'login-message success';
-          btn.textContent = 'Lien envoyé ✓';
+          _loginEmail = email;
+          document.getElementById('login-step1').style.display = 'none';
+          document.getElementById('login-step2').style.display = '';
+          msg.className = 'login-message';
+          setTimeout(() => document.getElementById('login-code').focus(), 100);
         }
+      }
+
+      async function verifierCode() {
+        const code = document.getElementById('login-code').value.trim();
+        const btn = document.getElementById('verify-btn');
+        const msg = document.getElementById('login-message');
+
+        if (!code || code.length < 6) {
+          msg.textContent = 'Entrez le code à 6 chiffres reçu par email.';
+          msg.className = 'login-message error';
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Vérification…';
+        msg.className = 'login-message';
+
+        const { error } = await supabaseClient.auth.verifyOtp({
+          email: _loginEmail,
+          token: code,
+          type: 'email'
+        });
+
+        if (error) {
+          msg.textContent = 'Code incorrect ou expiré. Réessayez.';
+          msg.className = 'login-message error';
+          btn.disabled = false;
+          btn.textContent = 'Se connecter ✓';
+        }
+        // Si succès : onAuthStateChange masque automatiquement l'écran de connexion
       }
 
       async function seDeconnecter() {
