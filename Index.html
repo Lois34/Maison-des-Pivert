@@ -1273,9 +1273,131 @@
         font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
         color: var(--text-muted); margin: 12px 0 6px; letter-spacing: 0.05em;
       }
+      /* ===== ÉCRAN DE CONNEXION ===== */
+      #login-screen {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        background: var(--bg-color);
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      #login-screen.hidden { display: none; }
+      .login-card {
+        background: var(--surface-color);
+        border-radius: 24px;
+        padding: 36px 28px;
+        width: 100%;
+        max-width: 360px;
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+      }
+      .login-logo { font-size: 3.5rem; margin-bottom: 10px; }
+      .login-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 6px;
+      }
+      .login-subtitle {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin-bottom: 28px;
+        line-height: 1.5;
+      }
+      .login-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1.5px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 1rem;
+        background: var(--input-bg);
+        color: var(--text-main);
+        margin-bottom: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .login-input:focus { border-color: var(--primary); }
+      .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .login-btn:hover { background: var(--primary-hover); }
+      .login-btn:disabled { opacity: 0.6; cursor: default; }
+      .login-message {
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        display: none;
+      }
+      .login-message.success {
+        background: rgba(72,187,120,0.15);
+        color: #276749;
+        display: block;
+      }
+      [data-theme="dark"] .login-message.success { color: #9ae6b4; }
+      .login-message.error {
+        background: rgba(229,62,62,0.1);
+        color: #c53030;
+        display: block;
+      }
+      [data-theme="dark"] .login-message.error { color: #fc8181; }
+      .btn-logout {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: var(--header-text);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background 0.2s, transform 0.2s;
+        margin-right: 6px;
+      }
+      .btn-logout:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
     </style>
   </head>
   <body>
+    <!-- Écran de connexion Magic Link -->
+    <div id="login-screen">
+      <div class="login-card">
+        <div class="login-logo">🐦</div>
+        <div class="login-title">La Maison des Piverts</div>
+        <div class="login-subtitle">Entrez votre email pour recevoir<br>votre lien de connexion</div>
+        <input
+          type="email"
+          id="login-email"
+          class="login-input"
+          placeholder="votre@email.com"
+          autocomplete="email"
+          onkeydown="if(event.key==='Enter') envoyerMagicLink()"
+        />
+        <button class="login-btn" id="login-btn" onclick="envoyerMagicLink()">
+          Envoyer le lien magique ✉️
+        </button>
+        <div class="login-message" id="login-message"></div>
+      </div>
+    </div>
+
     <header class="main-header">
       <div class="header-content">
         <div class="logo-container">
@@ -1292,6 +1414,7 @@
           </div>
         </div>
         <button class="btn-notif" id="btn-notif" onclick="ouvrirPanelNotif()" title="Notifications de péremption">🔔</button>
+        <button class="btn-logout" onclick="seDeconnecter()" title="Se déconnecter">🚪</button>
         <button class="theme-toggle" onclick="toggleTheme()" id="theme-icon">
           🌙
         </button>
@@ -1542,6 +1665,65 @@
       const SUPABASE_URL = "https://flrwnvtruxmrofamkegy.supabase.co";
       const SUPABASE_KEY = "sb_publishable_aZW6lNmcRo6tu8W5lWwMqw_cScLeyYu";
       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // ===== AUTHENTIFICATION =====
+      let currentUser = null;
+
+      // Écoute les changements de session (connexion / déconnexion)
+      supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (session) {
+          currentUser = session.user;
+          document.getElementById('login-screen').classList.add('hidden');
+          // Recharger les données après une connexion fraîche (lien magique cliqué)
+          if (event === 'SIGNED_IN') {
+            await chargerDonnees(true);
+            chargerListe();
+            chargerCourses(true);
+          }
+        } else {
+          currentUser = null;
+          document.getElementById('login-screen').classList.remove('hidden');
+        }
+      });
+
+      async function envoyerMagicLink() {
+        const email = document.getElementById('login-email').value.trim();
+        const btn = document.getElementById('login-btn');
+        const msg = document.getElementById('login-message');
+
+        if (!email) {
+          msg.textContent = 'Veuillez entrer votre email.';
+          msg.className = 'login-message error';
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Envoi en cours…';
+        msg.className = 'login-message';
+
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: window.location.origin + window.location.pathname }
+        });
+
+        if (error) {
+          msg.textContent = 'Erreur : ' + error.message;
+          msg.className = 'login-message error';
+          btn.disabled = false;
+          btn.textContent = 'Envoyer le lien magique ✉️';
+        } else {
+          msg.innerHTML = '✓ Lien envoyé !<br>Vérifiez votre boîte mail et cliquez sur le lien.';
+          msg.className = 'login-message success';
+          btn.textContent = 'Lien envoyé ✓';
+        }
+      }
+
+      async function seDeconnecter() {
+        await supabaseClient.auth.signOut();
+        showToast('Déconnectée avec succès');
+      }
+      // ===== FIN AUTHENTIFICATION =====
+
       let idModification = null;
       let cachedInventaire = null;
       let vueActuelle = 'grille';
@@ -2338,12 +2520,43 @@
         }
         majStatutNotif();
         if (Notification.permission === 'granted') {
+          // Vérifier et restaurer l'abonnement push si iOS l'a invalidé
+          await refreshAbonnementPush();
           const lastCheck = localStorage.getItem(NOTIF_LAST_KEY);
           const today = new Date().toDateString();
           if (lastCheck !== today) {
             localStorage.setItem(NOTIF_LAST_KEY, today);
             await verifierPeremptions(true);
           }
+        }
+      }
+
+      // Vérifie que l'abonnement push est toujours enregistré dans Supabase.
+      // iOS peut invalider les subscriptions silencieusement — cette fonction
+      // les restaure automatiquement à chaque ouverture de l'app.
+      async function refreshAbonnementPush() {
+        if (!('PushManager' in window) || !('serviceWorker' in navigator)) return;
+        try {
+          const sw = await navigator.serviceWorker.ready;
+          const sub = await sw.pushManager.getSubscription();
+          if (!sub) return; // pas d'abonnement local, rien à faire
+
+          const { endpoint, keys } = sub.toJSON();
+          const { data } = await supabaseClient
+            .from('push_subscriptions')
+            .select('endpoint')
+            .eq('endpoint', endpoint)
+            .maybeSingle();
+
+          if (!data) {
+            // L'abonnement a disparu de Supabase (expiré côté serveur) → on le recrée
+            const { error } = await supabaseClient
+              .from('push_subscriptions')
+              .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth }, { onConflict: 'endpoint' });
+            if (!error) console.info('Push subscription restaurée automatiquement.');
+          }
+        } catch(e) {
+          console.warn('refreshAbonnementPush:', e);
         }
       }
 
@@ -2477,9 +2690,17 @@
       }
 
       loadTheme();
-      chargerListe();
-      initNotifications();
-      chargerCourses(true); // badge visible dès le démarrage
+      // Vérifier la session avant de charger les données protégées par RLS
+      supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          currentUser = session.user;
+          document.getElementById('login-screen').classList.add('hidden');
+          chargerListe();
+          initNotifications();
+          chargerCourses(true);
+        }
+        // Sinon l'écran de connexion reste visible (affiché par défaut)
+      });
     </script>
   </body>
 </html>

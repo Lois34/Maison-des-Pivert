@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Ping Supabase
         run: |
-          curl -s "${{ secrets.SUPABASE_URL }}/rest/v1/${{ secrets.SUPABASE_TABLE }}?limit=1" \
+          # Ping push_subscriptions (pas de RLS, toujours accessible)
+          curl -s "${{ secrets.SUPABASE_URL }}/rest/v1/push_subscriptions?limit=1" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          echo "Ping Supabase OK"
