@@ -1273,160 +1273,9 @@
         font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
         color: var(--text-muted); margin: 12px 0 6px; letter-spacing: 0.05em;
       }
-      /* ===== ÉCRAN DE CONNEXION ===== */
-      #login-screen {
-        display: flex;
-        position: fixed;
-        inset: 0;
-        background: var(--bg-color);
-        z-index: 9999;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-      }
-      #login-screen.hidden { display: none; }
-      .login-card {
-        background: var(--surface-color);
-        border-radius: 24px;
-        padding: 36px 28px;
-        width: 100%;
-        max-width: 360px;
-        box-shadow: var(--shadow-lg);
-        text-align: center;
-      }
-      .login-logo { font-size: 3.5rem; margin-bottom: 10px; }
-      .login-title {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--text-main);
-        margin-bottom: 6px;
-      }
-      .login-subtitle {
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        margin-bottom: 28px;
-        line-height: 1.5;
-      }
-      .login-input {
-        width: 100%;
-        padding: 14px 16px;
-        border: 1.5px solid var(--border-color);
-        border-radius: 12px;
-        font-size: 1rem;
-        background: var(--input-bg);
-        color: var(--text-main);
-        margin-bottom: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-      }
-      .login-input:focus { border-color: var(--primary); }
-      .login-btn {
-        width: 100%;
-        padding: 14px;
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        font-size: 1rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
-      .login-btn:hover { background: var(--primary-hover); }
-      .login-btn:disabled { opacity: 0.6; cursor: default; }
-      .login-message {
-        margin-top: 16px;
-        padding: 12px 14px;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        display: none;
-      }
-      .login-message.success {
-        background: rgba(72,187,120,0.15);
-        color: #276749;
-        display: block;
-      }
-      [data-theme="dark"] .login-message.success { color: #9ae6b4; }
-      .login-message.error {
-        background: rgba(229,62,62,0.1);
-        color: #c53030;
-        display: block;
-      }
-      [data-theme="dark"] .login-message.error { color: #fc8181; }
-      .btn-logout {
-        background: rgba(255,255,255,0.15);
-        border: 1px solid rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.1rem;
-        cursor: pointer;
-        color: var(--header-text);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: background 0.2s, transform 0.2s;
-        margin-right: 6px;
-      }
-      .btn-logout:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
     </style>
   </head>
   <body>
-    <!-- Écran de connexion Magic Link -->
-    <div id="login-screen">
-      <div class="login-card">
-        <div class="login-logo">🐦</div>
-        <div class="login-title">La Maison des Piverts</div>
-
-        <!-- Étape 1 : saisie email -->
-        <div id="login-step1">
-          <div class="login-subtitle">Entrez votre email pour recevoir<br>un code de connexion à 6 chiffres</div>
-          <input
-            type="email"
-            id="login-email"
-            class="login-input"
-            placeholder="votre@email.com"
-            autocomplete="email"
-            onkeydown="if(event.key==='Enter') envoyerMagicLink()"
-          />
-          <button class="login-btn" id="login-btn" onclick="envoyerMagicLink()">
-            Envoyer le code ✉️
-          </button>
-        </div>
-
-        <!-- Étape 2 : saisie du code OTP -->
-        <div id="login-step2" style="display:none">
-          <div class="login-subtitle">Code envoyé !<br>Entrez les 8 chiffres reçus par email.</div>
-          <input
-            type="text"
-            id="login-code"
-            class="login-input"
-            placeholder="12345678"
-            maxlength="8"
-            inputmode="numeric"
-            autocomplete="one-time-code"
-            style="text-align:center; font-size:1.6rem; letter-spacing:6px; font-weight:700;"
-            onkeydown="if(event.key==='Enter') verifierCode()"
-          />
-          <button class="login-btn" id="verify-btn" onclick="verifierCode()">
-            Se connecter ✓
-          </button>
-          <button
-            onclick="document.getElementById('login-step1').style.display='';document.getElementById('login-step2').style.display='none';document.getElementById('login-message').className='login-message';"
-            style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;margin-top:12px;display:block;width:100%;">
-            ← Changer d'email
-          </button>
-        </div>
-
-        <div class="login-message" id="login-message"></div>
-      </div>
-    </div>
-
     <header class="main-header">
       <div class="header-content">
         <div class="logo-container">
@@ -1473,9 +1322,6 @@
           🔍 Vérifier maintenant
         </button>
         <div id="notif-items-container"></div>
-        <button onclick="seDeconnecter()" style="width:100%;margin-top:24px;padding:10px;border-radius:10px;border:1px solid var(--border-color);background:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;">
-          🚪 Se déconnecter
-        </button>
       </div>
     </div>
 
@@ -1696,121 +1542,7 @@
       const SUPABASE_URL = "https://flrwnvtruxmrofamkegy.supabase.co";
       const SUPABASE_KEY = "sb_publishable_aZW6lNmcRo6tu8W5lWwMqw_cScLeyYu";
 
-      // Stockage cookie : partagé entre Safari et la PWA iOS (contrairement au localStorage)
-      function cookieStorage() {
-        return {
-          getItem(key) {
-            const k = encodeURIComponent(key) + '=';
-            const row = document.cookie.split('; ').find(r => r.startsWith(k));
-            return row ? decodeURIComponent(row.slice(k.length)) : null;
-          },
-          setItem(key, value) {
-            const exp = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-            document.cookie = `${encodeURIComponent(key)}=${encodeURIComponent(value)}; expires=${exp}; path=/; SameSite=Lax`;
-          },
-          removeItem(key) {
-            document.cookie = `${encodeURIComponent(key)}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-          }
-        };
-      }
-
-      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-        auth: {
-          storage: cookieStorage(),
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-        }
-      });
-
-      // ===== AUTHENTIFICATION =====
-      let currentUser = null;
-
-      // Écoute les changements de session (connexion / déconnexion)
-      supabaseClient.auth.onAuthStateChange(async (event, session) => {
-        if (session) {
-          currentUser = session.user;
-          document.getElementById('login-screen').classList.add('hidden');
-          // Recharger les données après une connexion fraîche (lien magique cliqué)
-          if (event === 'SIGNED_IN') {
-            await chargerDonnees(true);
-            chargerListe();
-            chargerCourses(true);
-          }
-        } else {
-          currentUser = null;
-          document.getElementById('login-screen').classList.remove('hidden');
-        }
-      });
-
-      let _loginEmail = '';
-
-      async function envoyerMagicLink() {
-        const email = document.getElementById('login-email').value.trim();
-        const btn = document.getElementById('login-btn');
-        const msg = document.getElementById('login-message');
-
-        if (!email) {
-          msg.textContent = 'Veuillez entrer votre email.';
-          msg.className = 'login-message error';
-          return;
-        }
-
-        btn.disabled = true;
-        btn.textContent = 'Envoi en cours…';
-        msg.className = 'login-message';
-
-        const { error } = await supabaseClient.auth.signInWithOtp({ email });
-
-        if (error) {
-          msg.textContent = 'Erreur : ' + error.message;
-          msg.className = 'login-message error';
-          btn.disabled = false;
-          btn.textContent = 'Envoyer le code ✉️';
-        } else {
-          _loginEmail = email;
-          document.getElementById('login-step1').style.display = 'none';
-          document.getElementById('login-step2').style.display = '';
-          msg.className = 'login-message';
-          setTimeout(() => document.getElementById('login-code').focus(), 100);
-        }
-      }
-
-      async function verifierCode() {
-        const code = document.getElementById('login-code').value.trim();
-        const btn = document.getElementById('verify-btn');
-        const msg = document.getElementById('login-message');
-
-        if (!code) {
-          msg.textContent = 'Entrez le code reçu par email.';
-          msg.className = 'login-message error';
-          return;
-        }
-
-        btn.disabled = true;
-        btn.textContent = 'Vérification…';
-        msg.className = 'login-message';
-
-        const { error } = await supabaseClient.auth.verifyOtp({
-          email: _loginEmail,
-          token: code,
-          type: 'email'
-        });
-
-        if (error) {
-          msg.textContent = 'Code incorrect ou expiré. Réessayez.';
-          msg.className = 'login-message error';
-          btn.disabled = false;
-          btn.textContent = 'Se connecter ✓';
-        }
-        // Si succès : onAuthStateChange masque automatiquement l'écran de connexion
-      }
-
-      async function seDeconnecter() {
-        await supabaseClient.auth.signOut();
-        showToast('Déconnectée avec succès');
-      }
-      // ===== FIN AUTHENTIFICATION =====
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
       let idModification = null;
       let cachedInventaire = null;
@@ -2778,17 +2510,9 @@
       }
 
       loadTheme();
-      // Vérifier la session avant de charger les données protégées par RLS
-      supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-          currentUser = session.user;
-          document.getElementById('login-screen').classList.add('hidden');
-          chargerListe();
-          initNotifications();
-          chargerCourses(true);
-        }
-        // Sinon l'écran de connexion reste visible (affiché par défaut)
-      });
+      chargerListe();
+      initNotifications();
+      chargerCourses(true);
     </script>
   </body>
 </html>
