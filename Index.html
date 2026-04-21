@@ -8,6 +8,7 @@
     />
     <title>La Maison des Piverts v6.3</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.local.js" onerror="console.warn('config.local.js absent — IA désactivée')"></script>
     <style>
       :root[data-theme="light"] {
         --bg-color: #f0f4f8;
@@ -213,6 +214,32 @@
         box-shadow: var(--shadow-sm);
         border: 1px solid var(--border-color);
         transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+      }
+
+      .zone-photo-btn {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        background: rgba(0,0,0,0.4);
+        border: none;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        padding: 0;
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+
+      .zone-card:hover .zone-photo-btn {
+        opacity: 1;
       }
 
       .zone-card:hover {
@@ -1140,6 +1167,106 @@
         margin-bottom: 6px;
       }
 
+      /* ===== RECETTES ===== */
+      .recettes-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .recettes-title { font-size: 1.1rem; font-weight: 800; color: var(--text-main); }
+      .btn-ia-recette {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 14px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .recettes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      .recette-card {
+        background: var(--surface-color);
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+      .recette-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+      .recette-card-img { width: 100%; height: 110px; object-fit: cover; }
+      .recette-card-no-img {
+        width: 100%; height: 110px;
+        background: var(--input-bg);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.5rem;
+      }
+      .recette-card-body { padding: 10px 12px 12px; }
+      .recette-card-nom { font-weight: 700; font-size: 0.9rem; color: var(--text-main); margin-bottom: 4px; }
+      .recette-card-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .recettes-empty { text-align: center; padding: 55px 20px; }
+      .recettes-empty .empty-icon { font-size: 3.2rem; display: block; margin-bottom: 12px; }
+      .recettes-empty .empty-title { font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
+      .recettes-empty .empty-sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; }
+
+      /* Modal recette — form */
+      .airfryer-section { margin-top: 20px; }
+      .airfryer-section-title {
+        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px;
+      }
+      .airfryer-bloc {
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+      }
+      .airfryer-bloc-titre {
+        font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px;
+      }
+      .airfryer-row { display: grid; grid-template-columns: 1fr 80px 80px; gap: 8px; }
+      .airfryer-row label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 3px; }
+      .airfryer-row input {
+        width: 100%; padding: 7px 10px; border: 1px solid var(--border-color);
+        border-radius: 8px; background: var(--surface-color); color: var(--text-main);
+        font-size: 0.85rem;
+      }
+
+      /* Modal recette — detail */
+      .recette-detail-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; }
+      .recette-detail-nom { font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px; }
+      .recette-detail-desc { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+      .recette-detail-section { margin-bottom: 16px; }
+      .recette-detail-section-title {
+        font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px;
+      }
+      .recette-detail-text { font-size: 0.88rem; color: var(--text-main); line-height: 1.6; white-space: pre-wrap; }
+      .airfryer-detail-card {
+        background: var(--input-bg); border: 1px solid var(--border-color);
+        border-radius: 10px; padding: 10px 14px; margin-bottom: 8px;
+      }
+      .airfryer-detail-nom { font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+      .airfryer-detail-info { font-size: 0.85rem; color: var(--text-main); }
+      .airfryer-detail-info span { margin-right: 12px; }
+      .recette-detail-actions { display: flex; gap: 10px; margin-top: 20px; }
+      .recette-detail-actions .btn-save { flex: 1; }
+      .btn-delete-recette {
+        flex: 1; padding: 13px; border: 1px solid #ef4444; border-radius: 12px;
+        background: transparent; color: #ef4444; font-weight: 700; cursor: pointer; font-size: 0.95rem;
+      }
+
       /* ===== BOUTON "AJOUTER À LA LISTE" DANS MODAL INVENTAIRE ===== */
       .btn-add-to-courses {
         width: 100%;
@@ -1364,6 +1491,7 @@
 
     <!-- FAB contextuel -->
     <button class="fab" id="fab-btn" onclick="nouveauProduitOuCourse()">+</button>
+    <input type="file" id="photo-lieu-input" accept="image/*" capture="environment" style="display:none" onchange="uploaderPhotoLieu(this)">
 
     <!-- Modal Courses -->
     <div class="modal-overlay" id="modal-course" onclick="fermerModalCourse(event)">
@@ -1403,6 +1531,102 @@
       </div>
     </div>
 
+    <!-- Section Recettes -->
+    <div id="section-recettes" style="display:none">
+      <div class="container" style="padding-top:15px">
+        <div class="recettes-header">
+          <div class="recettes-title">📖 Mes recettes</div>
+          <button class="btn-ia-recette" onclick="suggererRecetteIA()">✨ Suggérer</button>
+        </div>
+        <div id="liste-recettes"></div>
+      </div>
+    </div>
+
+    <!-- Modal recette — ajout/édition -->
+    <div class="modal-overlay" id="modal-recette" onclick="fermerModalRecette(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2 id="modal-recette-title">Nouvelle recette</h2>
+          <button class="btn-close" onclick="fermerModalRecette()">×</button>
+        </div>
+        <div class="input-group">
+          <label>Nom de la recette</label>
+          <div class="input-wrapper"><input type="text" id="recette-nom" placeholder="Ex: Poulet rôti croustillant"></div>
+        </div>
+        <div class="input-group">
+          <label>Description courte (optionnel)</label>
+          <div class="input-wrapper"><input type="text" id="recette-desc" placeholder="Ex: Léger et savoureux"></div>
+        </div>
+        <div class="input-group">
+          <label>Photo (optionnel)</label>
+          <div class="file-upload">
+            <input type="file" id="recette-photo" accept="image/*" capture="environment" onchange="majLabelPhotoRecette()">
+            <div class="file-upload-label" id="recette-photo-label">📷 Prendre ou choisir une photo</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Ingrédients</label>
+          <div class="input-wrapper">
+            <textarea id="recette-ingredients" rows="4" placeholder="1 poulet entier&#10;2 cs d'huile d'olive&#10;Sel, poivre, paprika" style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:10px;background:var(--input-bg);color:var(--text-main);font-size:0.9rem;resize:vertical"></textarea>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Instructions</label>
+          <div class="input-wrapper">
+            <textarea id="recette-instructions" rows="5" placeholder="1. Préchauffer l'air fryer à 180°C&#10;2. Badigeonner le poulet d'huile..." style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:10px;background:var(--input-bg);color:var(--text-main);font-size:0.9rem;resize:vertical"></textarea>
+          </div>
+        </div>
+        <div class="airfryer-section">
+          <div class="airfryer-section-title">🔥 Réglages air fryer (optionnel)</div>
+          <div class="airfryer-bloc">
+            <div class="airfryer-bloc-titre">Ninja Combi 12-en-1</div>
+            <div class="airfryer-row">
+              <div><label>Mode</label><input type="text" id="af-ninja-combi-mode" placeholder="Ex: Air Fry" list="list-modes-ninja"></div>
+              <div><label>Temp (°C)</label><input type="number" id="af-ninja-combi-temp" placeholder="180" min="40" max="240"></div>
+              <div><label>Durée (min)</label><input type="number" id="af-ninja-combi-duree" placeholder="20" min="1" max="180"></div>
+            </div>
+          </div>
+          <div class="airfryer-bloc">
+            <div class="airfryer-bloc-titre">Philips classique</div>
+            <div class="airfryer-row">
+              <div><label>Mode</label><input type="text" id="af-philips-mode" placeholder="Ex: Air Fry" list="list-modes-std"></div>
+              <div><label>Temp (°C)</label><input type="number" id="af-philips-temp" placeholder="180" min="40" max="200"></div>
+              <div><label>Durée (min)</label><input type="number" id="af-philips-duree" placeholder="20" min="1" max="180"></div>
+            </div>
+          </div>
+          <div class="airfryer-bloc">
+            <div class="airfryer-bloc-titre">Ninja Crispi</div>
+            <div class="airfryer-row">
+              <div><label>Mode</label><input type="text" id="af-ninja-crispi-mode" placeholder="Ex: Air Fry" list="list-modes-std"></div>
+              <div><label>Temp (°C)</label><input type="number" id="af-ninja-crispi-temp" placeholder="180" min="40" max="210"></div>
+              <div><label>Durée (min)</label><input type="number" id="af-ninja-crispi-duree" placeholder="20" min="1" max="180"></div>
+            </div>
+          </div>
+          <datalist id="list-modes-ninja">
+            <option value="Air Fry"><option value="Bake"><option value="Roast"><option value="Grill">
+            <option value="Steam Air Fry"><option value="Combi Steam Bake"><option value="Reheat"><option value="Dehydrate">
+          </datalist>
+          <datalist id="list-modes-std">
+            <option value="Air Fry"><option value="Bake"><option value="Roast"><option value="Grill">
+            <option value="Reheat"><option value="Dehydrate">
+          </datalist>
+        </div>
+        <button class="btn-save" id="recette-btn" onclick="sauvegarderRecette()">➕ Ajouter</button>
+      </div>
+    </div>
+
+    <!-- Modal recette — détail -->
+    <div class="modal-overlay" id="modal-recette-detail" onclick="fermerModalRecetteDetail(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Recette</h2>
+          <button class="btn-close" onclick="fermerModalRecetteDetail()">×</button>
+        </div>
+        <div id="recette-detail-content"></div>
+        <input type="file" id="recette-detail-photo-input" accept="image/*" capture="environment" style="display:none" onchange="uploaderPhotoRecette(this)">
+      </div>
+    </div>
+
     <!-- Section Lessive -->
     <div id="section-lessive" style="display:none">
       <div class="container" style="padding-top:15px">
@@ -1438,6 +1662,10 @@
         <span class="nav-icon">🛒</span>
         <span id="nav-courses-badge" class="nav-badge" style="display:none">0</span>
         Courses
+      </button>
+      <button class="nav-item" id="nav-recettes" onclick="switchTab('recettes')">
+        <span class="nav-icon">📖</span>
+        Recettes
       </button>
       <button class="nav-item" id="nav-lessive" onclick="switchTab('lessive')">
         <span class="nav-icon">🧺</span>
@@ -1792,7 +2020,10 @@
                 const label = zone.charAt(0) + zone.slice(1).toLowerCase();
                 let imageHtml = "";
 
-                if (firstImageItem && firstImageItem.image_url) {
+                const lieuxPhotoUrl = cachedLieuxPhotos[zone + '|'];
+                if (lieuxPhotoUrl) {
+                  imageHtml = `<img src="${lieuxPhotoUrl}" class="zone-img">`;
+                } else if (firstImageItem && firstImageItem.image_url) {
                   imageHtml = `<img src="${firstImageItem.image_url}" class="zone-img">`;
                 } else {
                   let icon = "📦";
@@ -1817,16 +2048,13 @@
                   imageHtml = `<span class="zone-icon">${icon}</span>`;
                 }
 
+                const zoneSafe = zone.replace(/'/g, "\\'");
                 return `
-                    <div class="zone-card" onclick="filtrerParZone('${zone.replace(
-                      /'/g,
-                      "\\'"
-                    )}')">
+                    <div class="zone-card" onclick="filtrerParZone('${zoneSafe}')">
                         ${imageHtml}
                         <span class="zone-title">${label}</span>
-                        <span class="zone-count">${count} objet${
-                  count > 1 ? "s" : ""
-                }</span>
+                        <span class="zone-count">${count} objet${count > 1 ? "s" : ""}</span>
+                        <button class="zone-photo-btn" title="Changer la photo" onclick="event.stopPropagation();demanderPhotoLieu('${zoneSafe}','')">📷</button>
                     </div>
                     `;
               })
@@ -1865,10 +2093,17 @@
               </div>` +
               sousLieux.map(sl => {
                 const count = cachedInventaire.filter(i => i.lieu.toUpperCase() === fLieu.toUpperCase() && i.sous_lieu === sl).length;
-                return `<div class="zone-card" onclick="filtrerParSousLieu('${sl.replace(/'/g, "\\'")}')">
-                  <span class="zone-icon">${slIcons(sl)}</span>
+                const slPhotoUrl = cachedLieuxPhotos[fLieu.toUpperCase() + '|' + sl];
+                const slImageHtml = slPhotoUrl
+                  ? `<img src="${slPhotoUrl}" class="zone-img">`
+                  : `<span class="zone-icon">${slIcons(sl)}</span>`;
+                const slSafe = sl.replace(/'/g, "\\'");
+                const lieuSafe = fLieu.replace(/'/g, "\\'");
+                return `<div class="zone-card" onclick="filtrerParSousLieu('${slSafe}')">
+                  ${slImageHtml}
                   <span class="zone-title">${sl}</span>
                   <span class="zone-count">${count} objet${count > 1 ? "s" : ""}</span>
+                  <button class="zone-photo-btn" title="Changer la photo" onclick="event.stopPropagation();demanderPhotoLieu('${lieuSafe}','${slSafe}')">📷</button>
                 </div>`;
               }).join("") +
               `</div>`;
@@ -2088,10 +2323,28 @@
         try {
           await supabaseClient.from('liste_courses').insert([{ nom, quantite, achete: false }]);
           showToast('🛒 "' + nom + '" ajouté à la liste de courses !');
-          cachedCourses = null; // forcer le rechargement au prochain affichage
+          cachedCourses = null;
+          notifierNouvelArticleCourses(nom);
         } catch(e) {
           showToast('❌ Erreur : ' + e.message);
         }
+      }
+
+      function getDeviceId() {
+        let id = localStorage.getItem('pivert_device_id');
+        if (!id) {
+          id = crypto.randomUUID();
+          localStorage.setItem('pivert_device_id', id);
+        }
+        return id;
+      }
+
+      function notifierNouvelArticleCourses(nom) {
+        fetch(`${SUPABASE_URL}/functions/v1/notify-courses`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
+          body: JSON.stringify({ nom, device_id: getDeviceId() })
+        }).catch(() => {});
       }
 
       // ===== LISTE DE COURSES =====
@@ -2099,22 +2352,65 @@
       let cachedCourses = null;
       let idModifCourse = null;
 
+      // ===== PHOTOS DE LIEUX =====
+      let cachedLieuxPhotos = {};
+      let photoLieuCourant = { lieu: '', souslieu: '' };
+
+      async function chargerLieuxPhotos() {
+        const { data } = await supabaseClient.from('lieux_photos').select('lieu, sous_lieu, photo_url');
+        cachedLieuxPhotos = {};
+        if (data) data.forEach(r => {
+          cachedLieuxPhotos[r.lieu.toUpperCase() + '|' + (r.sous_lieu || '')] = r.photo_url;
+        });
+      }
+
+      function demanderPhotoLieu(lieu, souslieu) {
+        photoLieuCourant = { lieu, souslieu };
+        const input = document.getElementById('photo-lieu-input');
+        input.value = '';
+        input.click();
+      }
+
+      async function uploaderPhotoLieu(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const { lieu, souslieu } = photoLieuCourant;
+        showToast('⏳ Upload en cours...');
+        try {
+          const name = `lieu_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+          await supabaseClient.storage.from('photos').upload(name, file);
+          const url = supabaseClient.storage.from('photos').getPublicUrl(name).data.publicUrl;
+          await supabaseClient.from('lieux_photos').upsert(
+            { lieu, sous_lieu: souslieu || '', photo_url: url },
+            { onConflict: 'lieu,sous_lieu' }
+          );
+          cachedLieuxPhotos[lieu.toUpperCase() + '|' + (souslieu || '')] = url;
+          showToast('✅ Photo enregistrée !');
+          chargerListe();
+        } catch(e) {
+          showToast('❌ Erreur : ' + e.message);
+        }
+      }
+
       let lessiveInterval = null;
 
       function switchTab(tab) {
         tabActuel = tab;
         document.getElementById('section-inventaire').style.display = tab === 'inventaire' ? '' : 'none';
         document.getElementById('section-courses').style.display = tab === 'courses' ? '' : 'none';
+        document.getElementById('section-recettes').style.display = tab === 'recettes' ? '' : 'none';
         document.getElementById('section-lessive').style.display = tab === 'lessive' ? '' : 'none';
         document.getElementById('nav-inventaire').classList.toggle('active', tab === 'inventaire');
         document.getElementById('nav-courses').classList.toggle('active', tab === 'courses');
+        document.getElementById('nav-recettes').classList.toggle('active', tab === 'recettes');
         document.getElementById('nav-lessive').classList.toggle('active', tab === 'lessive');
 
-        // FAB masqué sur l'onglet Lessive (pas d'ajout pertinent)
         document.getElementById('fab-btn').style.display = tab === 'lessive' ? 'none' : '';
 
         if (tab === 'courses') {
           chargerCourses(true);
+        } else if (tab === 'recettes') {
+          chargerRecettes();
         } else if (tab === 'lessive') {
           calculerLessive();
           clearInterval(lessiveInterval);
@@ -2126,6 +2422,7 @@
 
       function nouveauProduitOuCourse() {
         if (tabActuel === 'inventaire') nouveauProduit();
+        else if (tabActuel === 'recettes') ouvrirModalRecette();
         else ouvrirModalCourse();
       }
 
@@ -2253,6 +2550,7 @@
           } else {
             await supabaseClient.from('liste_courses').insert([{ nom, quantite, magasin, achete: false }]);
             showToast('✅ Article ajouté à la liste !');
+            notifierNouvelArticleCourses(nom);
           }
           fermerModalCourse();
           await chargerCourses(true);
@@ -2372,7 +2670,7 @@
             // L'abonnement a disparu de Supabase (expiré côté serveur) → on le recrée
             const { error } = await supabaseClient
               .from('push_subscriptions')
-              .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth }, { onConflict: 'endpoint' });
+              .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id: getDeviceId() }, { onConflict: 'endpoint' });
             if (!error) console.info('Push subscription restaurée automatiquement.');
           }
         } catch(e) {
@@ -2422,7 +2720,7 @@
           const { endpoint, keys } = subscription.toJSON();
           const { error } = await supabaseClient
             .from('push_subscriptions')
-            .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth }, { onConflict: 'endpoint' });
+            .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id: getDeviceId() }, { onConflict: 'endpoint' });
           if (error) throw error;
           showToast('✅ Notifications activées !');
           await verifierPeremptions(false);
@@ -2509,8 +2807,316 @@
         container.innerHTML = html;
       }
 
+      // ===== RECETTES =====
+      let cachedRecettes = null;
+      let idModifRecette = null;
+
+      const AIRFRYERS = [
+        { key: 'ninja_combi',  id: 'ninja-combi',  label: 'Ninja Combi 12-en-1' },
+        { key: 'philips',      id: 'philips',       label: 'Philips classique' },
+        { key: 'ninja_crispi', id: 'ninja-crispi',  label: 'Ninja Crispi' },
+      ];
+
+      async function chargerRecettes(forceReload = false) {
+        if (cachedRecettes && !forceReload) { afficherRecettes(); return; }
+        const { data } = await supabaseClient.from('recettes').select('*').order('created_at', { ascending: false });
+        cachedRecettes = data || [];
+        afficherRecettes();
+      }
+
+      function afficherRecettes() {
+        const container = document.getElementById('liste-recettes');
+        if (!cachedRecettes || cachedRecettes.length === 0) {
+          container.innerHTML = `<div class="recettes-empty">
+            <span class="empty-icon">📖</span>
+            <div class="empty-title">Aucune recette pour l'instant</div>
+            <div class="empty-sub">Appuie sur + pour ajouter ta première recette</div>
+          </div>`;
+          return;
+        }
+        container.innerHTML = '<div class="recettes-grid">' +
+          cachedRecettes.map(r => `
+            <div class="recette-card" onclick="ouvrirDetailRecette('${r.id}')">
+              ${r.image_url
+                ? `<img class="recette-card-img" src="${escHtml(r.image_url)}" loading="lazy" alt="${escHtml(r.nom)}">`
+                : `<div class="recette-card-no-img">🍽️</div>`}
+              <div class="recette-card-body">
+                <div class="recette-card-nom">${escHtml(r.nom)}</div>
+                ${r.description ? `<div class="recette-card-desc">${escHtml(r.description)}</div>` : ''}
+              </div>
+            </div>`).join('') +
+          '</div>';
+      }
+
+      function ouvrirModalRecette(recette = null) {
+        idModifRecette = recette ? recette.id : null;
+        document.getElementById('modal-recette-title').innerText = recette ? 'Modifier la recette' : 'Nouvelle recette';
+        document.getElementById('recette-nom').value = recette?.nom || '';
+        document.getElementById('recette-desc').value = recette?.description || '';
+        document.getElementById('recette-ingredients').value = recette?.ingredients || '';
+        document.getElementById('recette-instructions').value = recette?.instructions || '';
+        document.getElementById('recette-photo-label').innerText = '📷 Prendre ou choisir une photo';
+        document.getElementById('recette-photo').value = '';
+        document.getElementById('recette-btn').innerHTML = recette ? '✏️ Modifier' : '➕ Ajouter';
+
+        AIRFRYERS.forEach(af => {
+          const c = recette?.cuisson?.[af.key] || {};
+          document.getElementById(`af-${af.id}-mode`).value = c.mode || '';
+          document.getElementById(`af-${af.id}-temp`).value = c.temperature || '';
+          document.getElementById(`af-${af.id}-duree`).value = c.duree || '';
+        });
+
+        document.getElementById('modal-recette').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => document.getElementById('recette-nom').focus(), 100);
+      }
+
+      function fermerModalRecette(e) {
+        if (e && e.target !== document.getElementById('modal-recette')) return;
+        document.getElementById('modal-recette').classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+
+      function majLabelPhotoRecette() {
+        const file = document.getElementById('recette-photo').files[0];
+        document.getElementById('recette-photo-label').innerText = file ? '✅ ' + file.name : '📷 Prendre ou choisir une photo';
+      }
+
+      async function sauvegarderRecette() {
+        const nom = document.getElementById('recette-nom').value.trim();
+        if (!nom) { showToast('⚠️ Le nom est obligatoire'); return; }
+
+        const btn = document.getElementById('recette-btn');
+        btn.innerHTML = '⏳ En cours...'; btn.disabled = true;
+
+        try {
+          let image_url = idModifRecette ? (cachedRecettes.find(r => r.id === idModifRecette)?.image_url || null) : null;
+          const file = document.getElementById('recette-photo').files[0];
+          if (file) {
+            const name = `recette_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+            await supabaseClient.storage.from('photos').upload(name, file);
+            image_url = supabaseClient.storage.from('photos').getPublicUrl(name).data.publicUrl;
+          }
+
+          const cuisson = {};
+          AIRFRYERS.forEach(af => {
+            const mode = document.getElementById(`af-${af.id}-mode`).value.trim();
+            const temp = parseInt(document.getElementById(`af-${af.id}-temp`).value);
+            const duree = parseInt(document.getElementById(`af-${af.id}-duree`).value);
+            if (mode || temp || duree) {
+              cuisson[af.key] = { mode: mode || null, temperature: temp || null, duree: duree || null };
+            }
+          });
+
+          const payload = {
+            nom,
+            description: document.getElementById('recette-desc').value.trim() || null,
+            ingredients: document.getElementById('recette-ingredients').value.trim() || null,
+            instructions: document.getElementById('recette-instructions').value.trim() || null,
+            image_url,
+            cuisson,
+          };
+
+          if (idModifRecette) {
+            await supabaseClient.from('recettes').update(payload).eq('id', idModifRecette);
+            showToast('✅ Recette modifiée !');
+          } else {
+            await supabaseClient.from('recettes').insert([payload]);
+            showToast('✅ Recette ajoutée !');
+          }
+
+          document.getElementById('modal-recette').classList.remove('active');
+          document.body.style.overflow = 'auto';
+          await chargerRecettes(true);
+        } catch(e) {
+          showToast('❌ Erreur : ' + e.message);
+        } finally {
+          btn.innerHTML = idModifRecette ? '✏️ Modifier' : '➕ Ajouter';
+          btn.disabled = false;
+        }
+      }
+
+      function ouvrirDetailRecette(id) {
+        const r = cachedRecettes && cachedRecettes.find(r => r.id === id);
+        if (!r) return;
+
+        const afHtml = AIRFRYERS
+          .filter(af => r.cuisson && r.cuisson[af.key])
+          .map(af => {
+            const c = r.cuisson[af.key];
+            const infos = [
+              c.mode ? `🔧 ${escHtml(c.mode)}` : '',
+              c.temperature ? `🌡️ ${c.temperature}°C` : '',
+              c.duree ? `⏱️ ${c.duree} min` : '',
+            ].filter(Boolean).join('  ');
+            return `<div class="airfryer-detail-card">
+              <div class="airfryer-detail-nom">${escHtml(af.label)}</div>
+              <div class="airfryer-detail-info">${infos}</div>
+            </div>`;
+          }).join('');
+
+        document.getElementById('recette-detail-content').innerHTML = `
+          ${r.image_url ? `<img class="recette-detail-img" src="${escHtml(r.image_url)}" alt="${escHtml(r.nom)}">` : ''}
+          <div class="recette-detail-nom">${escHtml(r.nom)}</div>
+          ${r.description ? `<div class="recette-detail-desc">${escHtml(r.description)}</div>` : ''}
+          ${r.ingredients ? `<div class="recette-detail-section">
+            <div class="recette-detail-section-title">Ingrédients</div>
+            <div class="recette-detail-text">${escHtml(r.ingredients)}</div>
+          </div>` : ''}
+          ${r.instructions ? `<div class="recette-detail-section">
+            <div class="recette-detail-section-title">Instructions</div>
+            <div class="recette-detail-text">${escHtml(r.instructions)}</div>
+          </div>` : ''}
+          ${afHtml ? `<div class="recette-detail-section">
+            <div class="recette-detail-section-title">Réglages air fryer</div>
+            ${afHtml}
+          </div>` : ''}
+          <div class="recette-detail-actions">
+            <button class="btn-save" onclick="fermerModalRecetteDetail();ouvrirModalRecette(cachedRecettes.find(r=>r.id==='${r.id}'))">✏️ Modifier</button>
+            <button class="btn-save" style="background:var(--accent-color);flex:0 0 auto" onclick="document.getElementById('recette-detail-photo-input').dataset.id='${r.id}';document.getElementById('recette-detail-photo-input').click()">📷 ${r.image_url ? 'Changer' : 'Ajouter une photo'}</button>
+            <button class="btn-delete-recette" onclick="supprimerRecette('${r.id}')">🗑️ Supprimer</button>
+          </div>`;
+
+        document.getElementById('modal-recette-detail').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function fermerModalRecetteDetail(e) {
+        if (e && e.target !== document.getElementById('modal-recette-detail')) return;
+        document.getElementById('modal-recette-detail').classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+
+      async function uploaderPhotoRecette(input) {
+        const file = input.files[0];
+        const id = input.dataset.id;
+        if (!file || !id) return;
+        input.value = '';
+        showToast('⏳ Upload en cours…');
+        try {
+          const name = `recettes/${id}_${Date.now()}.jpg`;
+          await supabaseClient.storage.from('photos').upload(name, file);
+          const url = supabaseClient.storage.from('photos').getPublicUrl(name).data.publicUrl;
+          await supabaseClient.from('recettes').update({ image_url: url }).eq('id', id);
+          // Met à jour le cache local
+          const r = cachedRecettes.find(r => r.id === id);
+          if (r) r.image_url = url;
+          showToast('📷 Photo ajoutée !');
+          ouvrirDetailRecette(id);
+        } catch (e) {
+          showToast('❌ Erreur upload : ' + e.message);
+        }
+      }
+
+      async function supprimerRecette(id) {
+        if (!confirm('Supprimer cette recette ?')) return;
+        await supabaseClient.from('recettes').delete().eq('id', id);
+        fermerModalRecetteDetail();
+        showToast('🗑️ Recette supprimée');
+        await chargerRecettes(true);
+      }
+
+      async function suggererRecetteIA() {
+        if (typeof OPENROUTER_KEY === 'undefined' || OPENROUTER_KEY === 'COLLE_TA_CLÉ_ICI') {
+          showToast('⚠️ Clé OpenRouter manquante dans config.local.js');
+          return;
+        }
+
+        const btnIA = document.querySelector('.btn-ia-recette');
+        const texteOriginal = btnIA.innerHTML;
+        btnIA.innerHTML = '⏳ En cours…';
+        btnIA.disabled = true;
+
+        try {
+          // Récupère les noms des articles de l'inventaire comme base d'ingrédients
+          const { data: inventaire } = await supabaseClient
+            .from('inventaire')
+            .select('nom')
+            .order('created_at', { ascending: false })
+            .limit(30);
+
+          const ingredients = (inventaire || []).map(i => i.nom);
+          const listeIngredients = ingredients.length
+            ? ingredients.join(', ')
+            : 'ingrédients variés du placard';
+
+          const prompt = `Tu es un assistant culinaire. Propose UNE recette adaptée à l'air fryer en utilisant tout ou partie de ces ingrédients : ${listeIngredients}.
+
+Réponds UNIQUEMENT en JSON valide avec exactement ces champs :
+{
+  "nom": "Nom de la recette",
+  "description": "Courte description appétissante (1 phrase)",
+  "ingredients": "liste des ingrédients avec quantités, un par ligne",
+  "instructions": "étapes numérotées, une par ligne",
+  "cuisson": {
+    "ninja_combi": { "mode": "Air Fry", "temperature": 180, "duree": 25 },
+    "philips": { "mode": "Air Fry", "temperature": 180, "duree": 25 },
+    "ninja_crispi": { "mode": "Air Fry", "temperature": 180, "duree": 25 }
+  }
+}`;
+
+          const MODELS = [
+            'google/gemma-4-31b-it:free',
+            'google/gemma-4-26b-a4b-it:free',
+            'nvidia/nemotron-3-super-120b-a12b:free',
+            'inclusionai/ling-2.6-flash:free',
+          ];
+
+          let data = null;
+          for (const model of MODELS) {
+            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${OPENROUTER_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://lamaisondespiverts.netlify.app',
+                'X-Title': 'La Maison des Piverts',
+              },
+              body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }] }),
+            });
+            if (res.ok) { data = await res.json(); break; }
+            const errBody = await res.text();
+            if (res.status !== 429 && res.status !== 404) throw new Error(`API ${res.status} : ${errBody}`);
+          }
+          if (!data) throw new Error('Tous les modèles gratuits sont surchargés, réessaie dans 1 minute.');
+          const raw = data.choices[0].message.content;
+          // Extrait le JSON même s'il est entouré de markdown ```json ... ```
+          const jsonMatch = raw.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) throw new Error('Réponse IA non parseable');
+          const recette = JSON.parse(jsonMatch[0]);
+
+          // Pré-remplit le formulaire et ouvre le modal
+          ouvrirModalRecette();
+          document.getElementById('modal-recette-title').innerText = '✨ Recette suggérée par l\'IA';
+          document.getElementById('recette-nom').value = recette.nom || '';
+          document.getElementById('recette-desc').value = recette.description || '';
+          document.getElementById('recette-ingredients').value = recette.ingredients || '';
+          document.getElementById('recette-instructions').value = recette.instructions || '';
+
+          if (recette.cuisson) {
+            AIRFRYERS.forEach(af => {
+              const c = recette.cuisson[af.key] || {};
+              const modeEl = document.getElementById(`af-${af.id}-mode`);
+              const tempEl = document.getElementById(`af-${af.id}-temp`);
+              const dureeEl = document.getElementById(`af-${af.id}-duree`);
+              if (modeEl) modeEl.value = c.mode || '';
+              if (tempEl) tempEl.value = c.temperature || '';
+              if (dureeEl) dureeEl.value = c.duree || '';
+            });
+          }
+
+          showToast('✨ Recette générée ! Vérifie et sauvegarde.');
+        } catch (e) {
+          console.error(e);
+          showToast('❌ Erreur IA : ' + e.message);
+        } finally {
+          btnIA.innerHTML = texteOriginal;
+          btnIA.disabled = false;
+        }
+      }
+
       loadTheme();
-      chargerListe();
+      chargerLieuxPhotos().then(chargerListe);
       initNotifications();
       chargerCourses(true);
     </script>

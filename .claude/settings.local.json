@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(netlify --version)",
+      "Bash(netlify status:*)",
+      "Bash(netlify deploy:*)",
+      "Bash(awk NR>=2478 && NR<=2486 *)",
+      "Bash(dir \"C:\\\\Users\\\\Coco\\\\OneDrive\\\\Bureau\\\\AppPivert\" /b)",
+      "Bash(awk NR>=1469 && NR<=1480 *)"
+    ]
+  }
+}
