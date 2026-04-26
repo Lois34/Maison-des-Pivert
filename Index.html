@@ -7,9 +7,11 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>La Maison des Piverts v6.3</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <script src="config.local.js" onerror="console.warn('config.local.js absent — IA désactivée')"></script>
     <style>
       :root[data-theme="light"] {
         --bg-color: #f0f4f8;
@@ -60,7 +62,7 @@
         background-color: var(--bg-color);
         color: var(--text-main);
         -webkit-font-smoothing: antialiased;
-        padding-bottom: 130px;
+        padding-bottom: 80px;
       }
 
       .main-header {
@@ -215,32 +217,6 @@
         box-shadow: var(--shadow-sm);
         border: 1px solid var(--border-color);
         transition: transform 0.2s, box-shadow 0.2s;
-        position: relative;
-      }
-
-      .zone-photo-btn {
-        position: absolute;
-        top: 7px;
-        right: 7px;
-        background: rgba(0,0,0,0.4);
-        border: none;
-        border-radius: 50%;
-        width: 26px;
-        height: 26px;
-        font-size: 0.75rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        padding: 0;
-        z-index: 2;
-        opacity: 0;
-        transition: opacity 0.15s;
-      }
-
-      .zone-card:hover .zone-photo-btn {
-        opacity: 1;
       }
 
       .zone-card:hover {
@@ -250,8 +226,8 @@
       }
 
       .zone-img {
-        width: 80px;
-        height: 80px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         object-fit: cover;
         margin: 0 auto 10px auto;
@@ -443,7 +419,7 @@
 
       .fab {
         position: fixed;
-        bottom: 90px;
+        bottom: 30px;
         right: 30px;
         width: 60px;
         height: 60px;
@@ -804,497 +780,7 @@
 
       .produit-card-badge.badge-danger { background: rgba(197, 48, 48, 0.88); }
       .produit-card-badge.badge-warning { background: rgba(214, 99, 18, 0.88); }
-
-      /* ===== BOTTOM NAV ===== */
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--surface-color);
-        border-top: 1px solid var(--border-color);
-        display: flex;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-        z-index: 500;
-      }
-
-      .nav-item {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 8px 2px 12px;
-        gap: 3px;
-        cursor: pointer;
-        color: var(--text-muted);
-        font-size: 0.68rem;
-        font-weight: 600;
-        border: none;
-        background: transparent;
-        position: relative;
-        transition: color 0.2s;
-        white-space: nowrap;
-      }
-
-      .nav-item.active {
-        color: var(--primary);
-      }
-
-      .nav-icon {
-        font-size: 1.25rem;
-        line-height: 1;
-      }
-
-      .nav-badge {
-        position: absolute;
-        top: 7px;
-        right: calc(50% - 22px);
-        background: var(--danger);
-        color: white;
-        border-radius: 10px;
-        padding: 1px 5px;
-        font-size: 0.6rem;
-        font-weight: 700;
-        min-width: 16px;
-        text-align: center;
-        line-height: 1.5;
-      }
-
-      /* ===== LISTE DE COURSES ===== */
-      #section-courses .container {
-        padding-top: 15px;
-      }
-
-      .courses-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding: 0 2px;
-      }
-
-      .courses-title {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: var(--text-main);
-      }
-
-      .courses-progress {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        font-weight: 500;
-        margin-top: 3px;
-      }
-
-      .btn-reset-courses {
-        background: var(--input-bg);
-        border: 1px solid var(--border-color);
-        color: var(--text-muted);
-        padding: 9px 14px;
-        border-radius: 12px;
-        font-size: 0.82rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        white-space: nowrap;
-      }
-
-      .btn-reset-courses:hover {
-        background: var(--border-color);
-        color: var(--text-main);
-      }
-
-      .courses-group-header {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        padding: 14px 4px 7px;
-        border-bottom: 1px solid var(--border-color);
-        margin-bottom: 8px;
-      }
-
-      .courses-group-header:first-child {
-        padding-top: 0;
-      }
-
-      .course-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: var(--surface-color);
-        border-radius: 14px;
-        padding: 14px 16px;
-        margin-bottom: 10px;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--border-color);
-        transition: all 0.25s;
-      }
-
-      .course-item.achete {
-        opacity: 0.45;
-        background: var(--bg-color);
-      }
-
-      .course-checkbox {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        border: 2px solid var(--border-color);
-        background: transparent;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        flex-shrink: 0;
-        transition: all 0.2s;
-        color: white;
-        font-size: 0.9rem;
-        font-weight: 700;
-      }
-
-      .course-checkbox.checked {
-        background: var(--primary);
-        border-color: var(--primary);
-      }
-
-      .course-info {
-        flex: 1;
-        min-width: 0;
-        cursor: pointer;
-      }
-
-      .course-nom {
-        font-weight: 700;
-        font-size: 1rem;
-        color: var(--text-main);
-        transition: all 0.2s;
-      }
-
-      .course-item.achete .course-nom {
-        text-decoration: line-through;
-        color: var(--text-muted);
-      }
-
-      .course-meta {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 5px;
-        flex-wrap: wrap;
-      }
-
-      .course-qty {
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        background: var(--bg-color);
-        padding: 1px 7px;
-        border-radius: 10px;
-        border: 1px solid var(--border-color);
-      }
-
-      .course-magasin {
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: var(--primary);
-        background: rgba(45, 90, 39, 0.08);
-        padding: 2px 9px;
-        border-radius: 10px;
-        border: 1px solid rgba(45, 90, 39, 0.15);
-      }
-
-      [data-theme="dark"] .course-magasin {
-        background: rgba(72, 187, 120, 0.12);
-        border-color: rgba(72, 187, 120, 0.25);
-      }
-
-      .course-btn-del {
-        background: transparent;
-        border: 1px solid rgba(197, 48, 48, 0.2);
-        color: var(--danger);
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        opacity: 0.55;
-        transition: all 0.2s;
-        flex-shrink: 0;
-      }
-
-      .course-btn-del:hover {
-        opacity: 1;
-        background: rgba(197, 48, 48, 0.08);
-        border-color: rgba(197, 48, 48, 0.5);
-      }
-
-      .courses-empty {
-        text-align: center;
-        padding: 55px 20px;
-        color: var(--text-muted);
-      }
-
-      .courses-empty .empty-icon {
-        font-size: 3.2rem;
-        display: block;
-        margin-bottom: 14px;
-      }
-
-      .courses-empty .empty-title {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: var(--text-main);
-      }
-
-      .courses-empty .empty-sub {
-        font-size: 0.875rem;
-        margin-top: 6px;
-        font-weight: 400;
-      }
-
-      /* ===== SECTION LESSIVE ===== */
-      .lessive-card {
-        background: var(--surface-color);
-        border-radius: 24px;
-        padding: 32px 24px 28px;
-        text-align: center;
-        box-shadow: var(--shadow-md);
-        border: 1px solid var(--border-color);
-        margin-bottom: 18px;
-      }
-
-      .lessive-icon {
-        font-size: 3.2rem;
-        display: block;
-        margin-bottom: 10px;
-      }
-
-      .lessive-title {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: var(--text-main);
-        margin-bottom: 4px;
-      }
-
-      .lessive-subtitle {
-        font-size: 0.875rem;
-        color: var(--text-muted);
-        font-weight: 500;
-        margin-bottom: 28px;
-      }
-
-      .lessive-clock {
-        display: flex;
-        align-items: baseline;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 24px;
-      }
-
-      .lessive-clock-label {
-        font-size: 0.875rem;
-        color: var(--text-muted);
-        font-weight: 500;
-      }
-
-      .lessive-clock-time {
-        font-size: 2.4rem;
-        font-weight: 800;
-        color: var(--text-main);
-        letter-spacing: -1px;
-        font-variant-numeric: tabular-nums;
-      }
-
-      .lessive-result-box {
-        background: linear-gradient(135deg, var(--primary) 0%, #1e3f1a 100%);
-        border-radius: 20px;
-        padding: 28px 20px 22px;
-        margin-bottom: 20px;
-        color: white;
-      }
-
-      .lessive-result-box.hors-creuse {
-        background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
-      }
-
-      .lessive-result-label {
-        font-size: 0.85rem;
-        opacity: 0.85;
-        font-weight: 500;
-        margin-bottom: 10px;
-        letter-spacing: 0.2px;
-      }
-
-      .lessive-result-hours {
-        font-size: 5rem;
-        font-weight: 900;
-        letter-spacing: -3px;
-        line-height: 1;
-        margin-bottom: 10px;
-        font-variant-numeric: tabular-nums;
-      }
-
-      .lessive-result-sub {
-        font-size: 0.82rem;
-        opacity: 0.8;
-        line-height: 1.5;
-      }
-
-      .lessive-result-sub strong {
-        opacity: 1;
-        font-size: 0.9rem;
-      }
-
-      .lessive-info {
-        background: var(--surface-color);
-        border-radius: 16px;
-        padding: 16px 18px;
-        border: 1px solid var(--border-color);
-        font-size: 0.86rem;
-        color: var(--text-muted);
-        line-height: 1.6;
-        text-align: left;
-      }
-
-      .lessive-info-title {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: var(--text-muted);
-        margin-bottom: 6px;
-      }
-
-      /* ===== RECETTES ===== */
-      .recettes-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 16px;
-      }
-      .recettes-title { font-size: 1.1rem; font-weight: 800; color: var(--text-main); }
-      .btn-ia-recette {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        background: linear-gradient(135deg, #7c3aed, #a855f7);
-        color: white;
-        border: none;
-        border-radius: 20px;
-        padding: 8px 14px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        cursor: pointer;
-        white-space: nowrap;
-      }
-      .recettes-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 12px;
-      }
-      .recette-card {
-        background: var(--surface-color);
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid var(--border-color);
-        cursor: pointer;
-        transition: transform 0.15s, box-shadow 0.15s;
-      }
-      .recette-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-      .recette-card-img { width: 100%; height: 110px; object-fit: cover; }
-      .recette-card-no-img {
-        width: 100%; height: 110px;
-        background: var(--input-bg);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 2.5rem;
-      }
-      .recette-card-body { padding: 10px 12px 12px; }
-      .recette-card-nom { font-weight: 700; font-size: 0.9rem; color: var(--text-main); margin-bottom: 4px; }
-      .recette-card-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;
-        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-      .recettes-empty { text-align: center; padding: 55px 20px; }
-      .recettes-empty .empty-icon { font-size: 3.2rem; display: block; margin-bottom: 12px; }
-      .recettes-empty .empty-title { font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
-      .recettes-empty .empty-sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; }
-
-      /* Modal recette — form */
-      .airfryer-section { margin-top: 20px; }
-      .airfryer-section-title {
-        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px;
-      }
-      .airfryer-bloc {
-        background: var(--input-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 12px 14px;
-        margin-bottom: 10px;
-      }
-      .airfryer-bloc-titre {
-        font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px;
-      }
-      .airfryer-row { display: grid; grid-template-columns: 1fr 80px 80px; gap: 8px; }
-      .airfryer-row label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 3px; }
-      .airfryer-row input {
-        width: 100%; padding: 7px 10px; border: 1px solid var(--border-color);
-        border-radius: 8px; background: var(--surface-color); color: var(--text-main);
-        font-size: 0.85rem;
-      }
-
-      /* Modal recette — detail */
-      .recette-detail-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; }
-      .recette-detail-nom { font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px; }
-      .recette-detail-desc { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
-      .recette-detail-section { margin-bottom: 16px; }
-      .recette-detail-section-title {
-        font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px;
-      }
-      .recette-detail-text { font-size: 0.88rem; color: var(--text-main); line-height: 1.6; white-space: pre-wrap; }
-      .airfryer-detail-card {
-        background: var(--input-bg); border: 1px solid var(--border-color);
-        border-radius: 10px; padding: 10px 14px; margin-bottom: 8px;
-      }
-      .airfryer-detail-nom { font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
-      .airfryer-detail-info { font-size: 0.85rem; color: var(--text-main); }
-      .airfryer-detail-info span { margin-right: 12px; }
-      .recette-detail-actions { display: flex; gap: 10px; margin-top: 20px; }
-      .recette-detail-actions .btn-save { flex: 1; }
-      .btn-delete-recette {
-        flex: 1; padding: 13px; border: 1px solid #ef4444; border-radius: 12px;
-        background: transparent; color: #ef4444; font-weight: 700; cursor: pointer; font-size: 0.95rem;
-      }
-
-      /* ===== BOUTON "AJOUTER À LA LISTE" DANS MODAL INVENTAIRE ===== */
-      .btn-add-to-courses {
-        width: 100%;
-        padding: 13px;
-        border-radius: 12px;
-        border: 1.5px solid var(--primary);
-        background: transparent;
-        color: var(--primary);
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        margin-bottom: 12px;
-      }
-      .btn-add-to-courses:hover {
-        background: rgba(45, 90, 39, 0.08);
-      }
-      [data-theme="dark"] .btn-add-to-courses:hover {
-        background: rgba(72, 187, 120, 0.1);
-      }
-
-      /* ===== NOTIFICATIONS ===== */
+      /* ---- NOTIFICATIONS ---- */
       .btn-notif {
         background: rgba(255, 255, 255, 0.15);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1368,7 +854,6 @@
       .notif-seuil-row {
         display: flex; align-items: center; gap: 8px;
         margin-bottom: 16px; font-size: 0.9rem; color: var(--text-main);
-        flex-wrap: wrap;
       }
       .notif-seuil-row input {
         width: 60px; padding: 6px 8px; border-radius: 8px;
@@ -1386,7 +871,7 @@
         width: 100%; padding: 10px; border-radius: 10px;
         background: transparent; color: var(--primary); font-size: 0.9rem;
         font-weight: 600; border: 2px solid var(--primary); cursor: pointer;
-        margin-bottom: 16px; transition: background 0.2s, color 0.2s;
+        margin-bottom: 16px; transition: background 0.2s;
       }
       .btn-notif-check:hover { background: var(--primary); color: white; }
       .notif-item-card {
@@ -1404,7 +889,7 @@
       }
     </style>
   </head>
-  <body onload="prechargerOCR()">
+  <body>
     <header class="main-header">
       <div class="header-content">
         <div class="logo-container">
@@ -1431,7 +916,7 @@
     <div class="notif-panel-overlay" id="notif-overlay" onclick="fermerPanelNotif()"></div>
     <div class="notif-panel" id="notif-panel">
       <div class="notif-panel-header">
-        <h3>🔔 Alertes de péremption</h3>
+        <h3>🔔 Notifications</h3>
         <button class="notif-panel-close" onclick="fermerPanelNotif()">×</button>
       </div>
       <div class="notif-panel-body">
@@ -1445,7 +930,7 @@
           <span>jours avant péremption</span>
         </div>
         <button class="btn-notif-activer" id="btn-activer-notif" onclick="activerNotifications()">
-          🔔 Activer les notifications
+          Activer les notifications
         </button>
         <button class="btn-notif-check" onclick="verifierPeremptions(false)">
           🔍 Vérifier maintenant
@@ -1454,226 +939,27 @@
       </div>
     </div>
 
-    <!-- Section Inventaire -->
-    <div id="section-inventaire">
-      <div class="container">
-        <div class="search-bar">
-          <input
-            type="text"
-            id="search"
-            placeholder="🔍 Rechercher un objet..."
-            onkeyup="chargerListe()"
-          />
-          <select id="filtre-lieu" onchange="chargerListe()">
-            <option value="">Tous les lieux</option>
-          </select>
-          <div class="vue-toggle">
-            <button class="btn-vue" id="btn-vue-liste" onclick="setVue('liste')" title="Vue liste">☰</button>
-            <button class="btn-vue active" id="btn-vue-grille" onclick="setVue('grille')" title="Vue grille">⊞</button>
-          </div>
-        </div>
-
-        <div id="liste-objets"></div>
-      </div>
-    </div>
-
-    <!-- Section Courses -->
-    <div id="section-courses" style="display:none">
-      <div class="container">
-        <div class="courses-header">
-          <div>
-            <div class="courses-title">🛒 Liste de courses</div>
-            <div id="courses-progress" class="courses-progress"></div>
-          </div>
-          <button class="btn-reset-courses" onclick="reinitialiserCourses()">↺ Tout décocher</button>
-        </div>
-        <div id="liste-courses"></div>
-      </div>
-    </div>
-
-    <!-- FAB contextuel -->
-    <button class="fab" id="fab-btn" onclick="nouveauProduitOuCourse()">+</button>
-    <input type="file" id="photo-lieu-input" accept="image/*" capture="environment" style="display:none" onchange="uploaderPhotoLieu(this)">
-
-    <!-- Modal Courses -->
-    <div class="modal-overlay" id="modal-course" onclick="fermerModalCourse(event)">
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-          <h2 id="modal-course-title">Ajouter un article</h2>
-          <button class="btn-close" onclick="fermerModalCourse()">×</button>
-        </div>
-
-        <div class="input-group">
-          <label>Article</label>
-          <div class="input-wrapper">
-            <input type="text" id="course-nom" placeholder="Ex: Lait, Pain..." list="list-course-noms" autocomplete="off" />
-            <datalist id="list-course-noms"></datalist>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label>Quantité</label>
-          <div class="input-wrapper">
-            <input type="number" id="course-quantite" min="1" value="1" />
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label>Magasin (optionnel)</label>
-          <div class="input-wrapper">
-            <input type="text" id="course-magasin" placeholder="Ex: Leclerc, Lidl..." list="list-magasins" autocomplete="off" />
-            <datalist id="list-magasins"></datalist>
-          </div>
-        </div>
-
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalCourse()">Annuler</button>
-          <button class="btn-save" id="course-btn" onclick="ajouterCourse()">🛒 Ajouter</button>
+    <div class="container">
+      <div class="search-bar">
+        <input
+          type="text"
+          id="search"
+          placeholder="🔍 Rechercher un objet..."
+          onkeyup="chargerListe()"
+        />
+        <select id="filtre-lieu" onchange="chargerListe()">
+          <option value="">Tous les lieux</option>
+        </select>
+        <div class="vue-toggle">
+          <button class="btn-vue" id="btn-vue-liste" onclick="setVue('liste')" title="Vue liste">☰</button>
+          <button class="btn-vue active" id="btn-vue-grille" onclick="setVue('grille')" title="Vue grille">⊞</button>
         </div>
       </div>
+
+      <div id="liste-objets"></div>
     </div>
 
-    <!-- Section Recettes -->
-    <div id="section-recettes" style="display:none">
-      <div class="container" style="padding-top:15px">
-        <div class="recettes-header">
-          <div class="recettes-title">📖 Mes recettes</div>
-          <button class="btn-ia-recette" onclick="suggererRecetteIA()">✨ Suggérer</button>
-        </div>
-        <div id="liste-recettes"></div>
-      </div>
-    </div>
-
-    <!-- Modal recette — ajout/édition -->
-    <div class="modal-overlay" id="modal-recette" onclick="fermerModalRecette(event)">
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-          <h2 id="modal-recette-title">Nouvelle recette</h2>
-          <button class="btn-close" onclick="fermerModalRecette()">×</button>
-        </div>
-        <div class="input-group">
-          <label>Nom de la recette</label>
-          <div class="input-wrapper"><input type="text" id="recette-nom" placeholder="Ex: Poulet rôti croustillant"></div>
-        </div>
-        <div class="input-group">
-          <label>Description courte (optionnel)</label>
-          <div class="input-wrapper"><input type="text" id="recette-desc" placeholder="Ex: Léger et savoureux"></div>
-        </div>
-        <div class="input-group">
-          <label>Photo (optionnel)</label>
-          <div class="file-upload">
-            <input type="file" id="recette-photo" accept="image/*" capture="environment" onchange="majLabelPhotoRecette()">
-            <div class="file-upload-label" id="recette-photo-label">📷 Prendre ou choisir une photo</div>
-          </div>
-        </div>
-        <div class="input-group">
-          <label>Ingrédients</label>
-          <div class="input-wrapper">
-            <textarea id="recette-ingredients" rows="4" placeholder="1 poulet entier&#10;2 cs d'huile d'olive&#10;Sel, poivre, paprika" style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:10px;background:var(--input-bg);color:var(--text-main);font-size:0.9rem;resize:vertical"></textarea>
-          </div>
-        </div>
-        <div class="input-group">
-          <label>Instructions</label>
-          <div class="input-wrapper">
-            <textarea id="recette-instructions" rows="5" placeholder="1. Préchauffer l'air fryer à 180°C&#10;2. Badigeonner le poulet d'huile..." style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:10px;background:var(--input-bg);color:var(--text-main);font-size:0.9rem;resize:vertical"></textarea>
-          </div>
-        </div>
-        <div class="airfryer-section">
-          <div class="airfryer-section-title">🔥 Réglages air fryer (optionnel)</div>
-          <div class="airfryer-bloc">
-            <div class="airfryer-bloc-titre">Ninja Combi 12-en-1</div>
-            <div class="airfryer-row">
-              <div><label>Mode</label><input type="text" id="af-ninja-combi-mode" placeholder="Ex: Air Fry" list="list-modes-ninja"></div>
-              <div><label>Temp (°C)</label><input type="number" id="af-ninja-combi-temp" placeholder="180" min="40" max="240"></div>
-              <div><label>Durée (min)</label><input type="number" id="af-ninja-combi-duree" placeholder="20" min="1" max="180"></div>
-            </div>
-          </div>
-          <div class="airfryer-bloc">
-            <div class="airfryer-bloc-titre">Philips classique</div>
-            <div class="airfryer-row">
-              <div><label>Mode</label><input type="text" id="af-philips-mode" placeholder="Ex: Air Fry" list="list-modes-std"></div>
-              <div><label>Temp (°C)</label><input type="number" id="af-philips-temp" placeholder="180" min="40" max="200"></div>
-              <div><label>Durée (min)</label><input type="number" id="af-philips-duree" placeholder="20" min="1" max="180"></div>
-            </div>
-          </div>
-          <div class="airfryer-bloc">
-            <div class="airfryer-bloc-titre">Ninja Crispi</div>
-            <div class="airfryer-row">
-              <div><label>Mode</label><input type="text" id="af-ninja-crispi-mode" placeholder="Ex: Air Fry" list="list-modes-std"></div>
-              <div><label>Temp (°C)</label><input type="number" id="af-ninja-crispi-temp" placeholder="180" min="40" max="210"></div>
-              <div><label>Durée (min)</label><input type="number" id="af-ninja-crispi-duree" placeholder="20" min="1" max="180"></div>
-            </div>
-          </div>
-          <datalist id="list-modes-ninja">
-            <option value="Air Fry"><option value="Bake"><option value="Roast"><option value="Grill">
-            <option value="Steam Air Fry"><option value="Combi Steam Bake"><option value="Reheat"><option value="Dehydrate">
-          </datalist>
-          <datalist id="list-modes-std">
-            <option value="Air Fry"><option value="Bake"><option value="Roast"><option value="Grill">
-            <option value="Reheat"><option value="Dehydrate">
-          </datalist>
-        </div>
-        <button class="btn-save" id="recette-btn" onclick="sauvegarderRecette()">➕ Ajouter</button>
-      </div>
-    </div>
-
-    <!-- Modal recette — détail -->
-    <div class="modal-overlay" id="modal-recette-detail" onclick="fermerModalRecetteDetail(event)">
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Recette</h2>
-          <button class="btn-close" onclick="fermerModalRecetteDetail()">×</button>
-        </div>
-        <div id="recette-detail-content"></div>
-        <input type="file" id="recette-detail-photo-input" accept="image/*" capture="environment" style="display:none" onchange="uploaderPhotoRecette(this)">
-      </div>
-    </div>
-
-    <!-- Section Lessive -->
-    <div id="section-lessive" style="display:none">
-      <div class="container" style="padding-top:15px">
-        <div class="lessive-card">
-          <span class="lessive-icon">🧺</span>
-          <div class="lessive-title">Minuterie heures creuses</div>
-          <div class="lessive-subtitle">Tarif réduit de 22h à 6h du matin</div>
-
-          <div class="lessive-clock">
-            <span class="lessive-clock-label">Il est</span>
-            <span class="lessive-clock-time" id="lessive-heure">--:--</span>
-          </div>
-
-          <div id="lessive-result"></div>
-        </div>
-
-        <div class="lessive-info">
-          <div class="lessive-info-title">Comment ça marche ?</div>
-          En heures creuses (22h–6h), l'électricité est moins chère. Ce calculateur
-          indique le délai à programmer sur la machine à laver pour qu'elle se
-          termine <strong>au plus près de 6h du matin</strong>.
-        </div>
-      </div>
-    </div>
-
-    <!-- Navigation basse -->
-    <nav class="bottom-nav">
-      <button class="nav-item active" id="nav-inventaire" onclick="switchTab('inventaire')">
-        <span class="nav-icon">📦</span>
-        Inventaire
-      </button>
-      <button class="nav-item" id="nav-courses" onclick="switchTab('courses')">
-        <span class="nav-icon">🛒</span>
-        <span id="nav-courses-badge" class="nav-badge" style="display:none">0</span>
-        Courses
-      </button>
-      <button class="nav-item" id="nav-recettes" onclick="switchTab('recettes')">
-        <span class="nav-icon">📖</span>
-        Recettes
-      </button>
-      <button class="nav-item" id="nav-lessive" onclick="switchTab('lessive')">
-        <span class="nav-icon">🧺</span>
-        Lessive
-      </button>
-    </nav>
+    <button class="fab" onclick="nouveauProduit()">+</button>
 
     <div class="modal-overlay" id="modal" onclick="fermerModal(event)">
       <div class="modal-content" onclick="event.stopPropagation()">
@@ -1684,20 +970,14 @@
 
         <div class="input-group">
           <label>Nom de l'objet</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="input-wrapper" style="flex:1">
-              <input
-                type="text"
-                id="nom"
-                placeholder="Ex: Perceuse"
-                list="list-noms"
-              />
-              <datalist id="list-noms"></datalist>
-            </div>
-            <button type="button" id="btn-ia-nom" onclick="document.getElementById('ia-photo-nom').click()"
-              title="Photo → IA suggère le nom"
-              style="flex-shrink:0;background:var(--primary);color:white;border:none;border-radius:10px;padding:10px 12px;font-size:1.1rem;cursor:pointer;line-height:1">📷✨</button>
-            <input type="file" id="ia-photo-nom" accept="image/*" capture="environment" style="display:none" onchange="suggererNomAvecIA(this)">
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="nom"
+              placeholder="Ex: Perceuse"
+              list="list-noms"
+            />
+            <datalist id="list-noms"></datalist>
           </div>
         </div>
 
@@ -1736,14 +1016,8 @@
 
         <div class="input-group">
           <label>Date de péremption (optionnel)</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <div class="input-wrapper" style="flex:1">
-              <input type="date" id="date_p" />
-            </div>
-            <button type="button" id="btn-ia-date" onclick="document.getElementById('ia-photo-date').click()"
-              title="Photo → IA lit la date de péremption"
-              style="flex-shrink:0;background:var(--primary);color:white;border:none;border-radius:10px;padding:10px 12px;font-size:1.1rem;cursor:pointer;line-height:1">📷📅</button>
-            <input type="file" id="ia-photo-date" accept="image/*" capture="environment" style="display:none" onchange="lireDatePeremptionIA(this)">
+          <div class="input-wrapper">
+            <input type="date" id="date_p" />
           </div>
         </div>
 
@@ -1763,12 +1037,6 @@
           </div>
         </div>
 
-        <div id="btn-courses-wrap" style="display:none">
-          <button class="btn-add-to-courses" onclick="ajouterDepuisInventaire()">
-            🛒 Ajouter à la liste de courses
-          </button>
-        </div>
-
         <div class="modal-actions">
           <button class="btn-cancel" onclick="fermerModal()">Annuler</button>
           <button class="btn-save" id="main-btn" onclick="ajouterOuModifier()">
@@ -1783,9 +1051,7 @@
     <script>
       const SUPABASE_URL = "https://flrwnvtruxmrofamkegy.supabase.co";
       const SUPABASE_KEY = "sb_publishable_aZW6lNmcRo6tu8W5lWwMqw_cScLeyYu";
-
       const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
       let idModification = null;
       let cachedInventaire = null;
       let vueActuelle = 'grille';
@@ -1899,7 +1165,6 @@
         const btn = document.getElementById("main-btn");
         btn.innerHTML = "➕ Ajouter";
         btn.className = "btn-save";
-        document.getElementById("btn-courses-wrap").style.display = "none";
         majNomFichier();
       }
 
@@ -1924,9 +1189,8 @@
         try {
           let url = null;
           if (file) {
-            const compressed = await compresserImage(file, 800, 0.75);
-            const name = `${Date.now()}.jpg`;
-            await supabaseClient.storage.from("photos").upload(name, compressed, { contentType: 'image/jpeg' });
+            const name = `${Date.now()}_${file.name}`;
+            await supabaseClient.storage.from("photos").upload(name, file);
             url = supabaseClient.storage.from("photos").getPublicUrl(name)
               .data.publicUrl;
           }
@@ -2035,10 +1299,7 @@
                 const label = zone.charAt(0) + zone.slice(1).toLowerCase();
                 let imageHtml = "";
 
-                const lieuxPhotoUrl = cachedLieuxPhotos[zone + '|'];
-                if (lieuxPhotoUrl) {
-                  imageHtml = `<img src="${lieuxPhotoUrl}" class="zone-img">`;
-                } else if (firstImageItem && firstImageItem.image_url) {
+                if (firstImageItem && firstImageItem.image_url) {
                   imageHtml = `<img src="${firstImageItem.image_url}" class="zone-img">`;
                 } else {
                   let icon = "📦";
@@ -2063,13 +1324,16 @@
                   imageHtml = `<span class="zone-icon">${icon}</span>`;
                 }
 
-                const zoneSafe = zone.replace(/'/g, "\\'");
                 return `
-                    <div class="zone-card" onclick="filtrerParZone('${zoneSafe}')">
+                    <div class="zone-card" onclick="filtrerParZone('${zone.replace(
+                      /'/g,
+                      "\\'"
+                    )}')">
                         ${imageHtml}
                         <span class="zone-title">${label}</span>
-                        <span class="zone-count">${count} objet${count > 1 ? "s" : ""}</span>
-                        <button class="zone-photo-btn" title="Changer la photo" onclick="event.stopPropagation();demanderPhotoLieu('${zoneSafe}','')">📷</button>
+                        <span class="zone-count">${count} objet${
+                  count > 1 ? "s" : ""
+                }</span>
                     </div>
                     `;
               })
@@ -2108,17 +1372,10 @@
               </div>` +
               sousLieux.map(sl => {
                 const count = cachedInventaire.filter(i => i.lieu.toUpperCase() === fLieu.toUpperCase() && i.sous_lieu === sl).length;
-                const slPhotoUrl = cachedLieuxPhotos[fLieu.toUpperCase() + '|' + sl];
-                const slImageHtml = slPhotoUrl
-                  ? `<img src="${slPhotoUrl}" class="zone-img">`
-                  : `<span class="zone-icon">${slIcons(sl)}</span>`;
-                const slSafe = sl.replace(/'/g, "\\'");
-                const lieuSafe = fLieu.replace(/'/g, "\\'");
-                return `<div class="zone-card" onclick="filtrerParSousLieu('${slSafe}')">
-                  ${slImageHtml}
+                return `<div class="zone-card" onclick="filtrerParSousLieu('${sl.replace(/'/g, "\\'")}')">
+                  <span class="zone-icon">${slIcons(sl)}</span>
                   <span class="zone-title">${sl}</span>
                   <span class="zone-count">${count} objet${count > 1 ? "s" : ""}</span>
-                  <button class="zone-photo-btn" title="Changer la photo" onclick="event.stopPropagation();demanderPhotoLieu('${lieuSafe}','${slSafe}')">📷</button>
                 </div>`;
               }).join("") +
               `</div>`;
@@ -2268,7 +1525,6 @@
         const btn = document.getElementById("main-btn");
         btn.innerHTML = "🔄 Mettre à jour";
         btn.className = "btn-save edit-mode";
-        document.getElementById("btn-courses-wrap").style.display = "";
 
         ouvrirModal();
       }
@@ -2286,588 +1542,10 @@
         }
       }
 
-      // ===== MINUTERIE HEURES CREUSES =====
-      function calculerLessive() {
-        const now = new Date();
-        const h = now.getHours();
-        const m = now.getMinutes();
+      loadTheme();
+      chargerListe();
 
-        // Horloge en temps réel
-        document.getElementById('lessive-heure').textContent =
-          `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-
-        // Minutes exactes jusqu'au prochain 6h00
-        // Si on est avant 6h : c'est ce matin. Sinon : c'est demain matin.
-        let minUntil6;
-        if (h < 6) {
-          minUntil6 = (6 - h) * 60 - m;
-        } else {
-          minUntil6 = (24 - h) * 60 - m + 6 * 60;
-        }
-
-        const hFloor = Math.floor(minUntil6 / 60);
-        const mRest = minUntil6 % 60;
-        const hCeil = Math.ceil(minUntil6 / 60);
-
-        const dureeStr = mRest === 0 ? `${hFloor}h pile` : `${hFloor}h ${mRest} min`;
-        const enCreuse = h >= 22 || h < 6;
-        const contextMsg = enCreuse
-          ? `✅ Vous êtes en heures creuses`
-          : `💡 Tarif creuses à partir de 22h`;
-        const arrondiMsg = mRest > 0
-          ? `Arrondi à l'heure inf. — finira entre 5h et 6h ✓`
-          : `La machine finira <em>exactement</em> à 6h00 ✓`;
-
-        document.getElementById('lessive-result').innerHTML = `
-          <div class="lessive-result-box${enCreuse ? '' : ' hors-creuse'}">
-            <div class="lessive-result-label">${contextMsg}</div>
-            <div class="lessive-result-label" style="margin-top:8px">Programmez votre machine sur</div>
-            <div class="lessive-result-hours">${hFloor}h</div>
-            <div class="lessive-result-sub">
-              Durée exacte : <strong>${dureeStr}</strong><br>
-              ${arrondiMsg}
-            </div>
-          </div>`;
-      }
-
-      // ===== AJOUTER À LA LISTE DE COURSES DEPUIS L'INVENTAIRE =====
-      async function ajouterDepuisInventaire() {
-        const nom = document.getElementById("nom").value.trim();
-        const quantite = parseInt(document.getElementById("quantite").value) || 1;
-        if (!nom) { showToast("⚠️ Le nom est vide"); return; }
-        try {
-          await supabaseClient.from('liste_courses').insert([{ nom, quantite, achete: false }]);
-          showToast('🛒 "' + nom + '" ajouté à la liste de courses !');
-          cachedCourses = null;
-          notifierNouvelArticleCourses(nom);
-        } catch(e) {
-          showToast('❌ Erreur : ' + e.message);
-        }
-      }
-
-      function getDeviceId() {
-        let id = localStorage.getItem('pivert_device_id');
-        if (!id) {
-          id = crypto.randomUUID();
-          localStorage.setItem('pivert_device_id', id);
-        }
-        return id;
-      }
-
-      function notifierNouvelArticleCourses(nom) {
-        fetch(`${SUPABASE_URL}/functions/v1/notify-courses`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
-          body: JSON.stringify({ nom, device_id: getDeviceId() })
-        }).catch(() => {});
-      }
-
-      // ===== LISTE DE COURSES =====
-      let tabActuel = 'inventaire';
-      let cachedCourses = null;
-      let idModifCourse = null;
-
-      // ===== PHOTOS DE LIEUX =====
-      let cachedLieuxPhotos = {};
-      let photoLieuCourant = { lieu: '', souslieu: '' };
-
-      async function chargerLieuxPhotos() {
-        const { data } = await supabaseClient.from('lieux_photos').select('lieu, sous_lieu, photo_url');
-        cachedLieuxPhotos = {};
-        if (data) data.forEach(r => {
-          cachedLieuxPhotos[r.lieu.toUpperCase() + '|' + (r.sous_lieu || '')] = r.photo_url;
-        });
-      }
-
-      function demanderPhotoLieu(lieu, souslieu) {
-        photoLieuCourant = { lieu, souslieu };
-        const input = document.getElementById('photo-lieu-input');
-        input.value = '';
-        input.click();
-      }
-
-      // ─── IA Vision : lecture produit & date de péremption ────────────────────
-
-      // ─── Vision IA (Gemini Flash) + fallback Tesseract OCR ──────────────────
-
-      let tesseractWorkerFra = null;
-
-      function prechargerOCR() {
-        // Pré-charge Tesseract en arrière-plan (fallback si vision IA indisponible)
-        Tesseract.createWorker('fra+eng', 1, { logger: () => {} })
-          .then(w => { tesseractWorkerFra = w; })
-          .catch(() => {});
-      }
-
-      async function fileToBase64(file) {
-        // Redimensionne à 1024px max avant envoi (économise les tokens)
-        return new Promise((resolve) => {
-          const img = new Image();
-          const url = URL.createObjectURL(file);
-          img.onload = () => {
-            URL.revokeObjectURL(url);
-            const maxW = 1024;
-            const ratio = Math.min(1, maxW / img.width);
-            const canvas = document.createElement('canvas');
-            canvas.width  = Math.round(img.width  * ratio);
-            canvas.height = Math.round(img.height * ratio);
-            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(blob => {
-              const reader = new FileReader();
-              reader.onload = e => resolve(e.target.result.split(',')[1]);
-              reader.readAsDataURL(blob);
-            }, 'image/jpeg', 0.85);
-          };
-          img.src = url;
-        });
-      }
-
-      async function appelVisionIA(base64, prompt) {
-        if (typeof OPENROUTER_KEY === 'undefined') return null;
-        const VISION_MODELS = [
-          'google/gemini-flash-1.5',
-          'google/gemini-2.0-flash-lite:free',
-          'meta-llama/llama-4-scout',
-        ];
-        for (const model of VISION_MODELS) {
-          try {
-            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${OPENROUTER_KEY}`,
-                'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://lamaisondespiverts.netlify.app',
-                'X-Title': 'La Maison des Piverts',
-              },
-              body: JSON.stringify({
-                model,
-                messages: [{ role: 'user', content: [
-                  { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64}` } },
-                  { type: 'text', text: prompt }
-                ]}]
-              })
-            });
-            const body = await res.json();
-            if (res.ok && body.choices?.[0]?.message?.content) {
-              console.log('✅ Vision IA OK :', model);
-              return body.choices[0].message.content.trim();
-            }
-            console.warn(`❌ [${model}] :`, body.error?.message || res.status);
-          } catch(e) { console.warn(`❌ [${model}] :`, e.message); }
-        }
-        return null;
-      }
-
-      async function ocrFallback(file) {
-        try {
-          if (!tesseractWorkerFra)
-            tesseractWorkerFra = await Tesseract.createWorker('fra+eng', 1, { logger: () => {} });
-          const { data: { text } } = await tesseractWorkerFra.recognize(file);
-          return text.trim();
-        } catch(e) { return ''; }
-      }
-
-      async function appelTexteIA(prompt) {
-        if (typeof OPENROUTER_KEY === 'undefined') return null;
-        const MODELS = [
-          'google/gemma-4-31b-it:free',
-          'google/gemma-4-26b-a4b-it:free',
-          'nvidia/nemotron-3-super-120b-a12b:free',
-          'inclusionai/ling-2.6-flash:free',
-        ];
-        for (const model of MODELS) {
-          try {
-            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${OPENROUTER_KEY}`,
-                'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://lamaisondespiverts.netlify.app',
-                'X-Title': 'La Maison des Piverts',
-              },
-              body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }] })
-            });
-            if (res.ok) {
-              const data = await res.json();
-              return data.choices?.[0]?.message?.content?.trim() || null;
-            }
-          } catch(e) { /* modèle suivant */ }
-        }
-        return null;
-      }
-
-      // Extrait la première date de péremption trouvée dans un texte OCR
-      function extraireDateDuTexte(texte) {
-        const mois = { jan:1,fév:2,fev:2,mar:3,avr:4,mai:5,juin:6,
-                       jul:7,jui:7,aoû:8,aou:8,sep:9,oct:10,nov:11,déc:12,dec:12 };
-        // Supprime les heures (HH:MM) pour éviter confusion avec les dates
-        const t = texte.replace(/\n/g, ' ').replace(/\b\d{1,2}:\d{2}\b/g, '');
-
-        // YYYY-MM-DD
-        let m = t.match(/\b(202\d)[-\/](0?\d|1[0-2])[-\/](0?\d|[12]\d|3[01])\b/);
-        if (m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
-
-        // DD/MM/YYYY ou DD.MM.YYYY ou DD-MM-YYYY
-        m = t.match(/\b(0?\d|[12]\d|3[01])[\/\.\-](0?\d|1[0-2])[\/\.\-](202\d)\b/);
-        if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-
-        // DD MM YYYY avec espaces
-        m = t.match(/\b(0[1-9]|[12]\d|3[01])\s+(0[1-9]|1[0-2])\s+(202\d)\b/);
-        if (m) return `${m[3]}-${m[2]}-${m[1]}`;
-
-        // DD MM YY avec espaces (ex: 01 02 29 → 2029-02-01)
-        m = t.match(/\b(0[1-9]|[12]\d|3[01])\s+(0[1-9]|1[0-2])\s+(\d{2})\b/);
-        if (m) return `20${m[3]}-${m[2]}-${m[1]}`;
-
-        // MM/YYYY ou MM.YYYY ou MM YYYY (sans jour → on prend le 1er du mois)
-        m = t.match(/\b(0[1-9]|1[0-2])[\s\/\.](202\d)\b/);
-        if (m) return `${m[2]}-${m[1]}-01`;
-
-        // DD/MM/YY ou DD.MM.YY
-        m = t.match(/\b(0?\d|[12]\d|3[01])[\/\.](0?\d|1[0-2])[\/\.](\d{2})\b/);
-        if (m) return `20${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-
-        // "12 jan 2026" ou "jan 2026"
-        m = t.match(/(\d{1,2})?\s*(jan|fév|fev|mar|avr|mai|juin|jul|jui|aoû|aou|sep|oct|nov|déc|dec)\.?\s*(202\d)/i);
-        if (m) {
-          const mo = String(mois[m[2].toLowerCase().substring(0,3)]).padStart(2,'0');
-          const d = m[1] ? m[1].padStart(2,'0') : '01';
-          return `${m[3]}-${mo}-${d}`;
-        }
-        return null;
-      }
-
-      async function suggererNomAvecIA(input) {
-        const file = input.files[0];
-        if (!file) return;
-        input.value = '';
-        const btn = document.getElementById('btn-ia-nom');
-        const original = btn.innerHTML;
-        btn.innerHTML = '⏳'; btn.disabled = true;
-        showToast('🤖 Analyse du produit…');
-        try {
-          const base64 = await fileToBase64(file);
-          const prompt = `Regarde cette photo de produit. Donne UNIQUEMENT son nom court en français (2 à 4 mots, ex: "Pâtes coquillettes Panzani", "Lait demi-écrémé", "Yaourt nature Danone", "Ricoré chicorée café"). Réponds avec UNIQUEMENT le nom, sans guillemets ni explication.`;
-          let nom = await appelVisionIA(base64, prompt);
-          if (!nom) {
-            // Fallback Tesseract + texte IA
-            showToast('🔍 Lecture étiquette…');
-            const texte = await ocrFallback(file);
-            if (texte) {
-              nom = await appelTexteIA(`Texte d'étiquette : "${texte.substring(0,400)}"\nDonne UNIQUEMENT le nom court du produit en français (2-4 mots). Juste le nom.`);
-            }
-          }
-          if (nom) {
-            document.getElementById('nom').value = nom.replace(/^["']|["']$/g, '').replace(/\.$/, '');
-            // La photo prise sert aussi de photo du produit
-            try {
-              const dt = new DataTransfer();
-              dt.items.add(file);
-              document.getElementById('photo').files = dt.files;
-              majNomFichier();
-            } catch(e) { /* DataTransfer non supporté sur ce navigateur */ }
-            showToast('✅ Nom suggéré et photo ajoutée !');
-          } else {
-            showToast('⚠️ Impossible d\'identifier le produit');
-          }
-        } catch(e) { showToast('❌ Erreur : ' + e.message); }
-        finally { btn.innerHTML = original; btn.disabled = false; }
-      }
-
-      async function lireDatePeremptionIA(input) {
-        const file = input.files[0];
-        if (!file) return;
-        input.value = '';
-        const btn = document.getElementById('btn-ia-date');
-        const original = btn.innerHTML;
-        btn.innerHTML = '⏳'; btn.disabled = true;
-        showToast('🤖 Lecture de la date…');
-        try {
-          const base64 = await fileToBase64(file);
-          const prompt = `Regarde cette photo d'emballage. Trouve la date de péremption (DLC, DLUO, "à consommer jusqu'au", "best before", "use by", "EXP", etc.). Réponds UNIQUEMENT avec la date au format YYYY-MM-DD. Si plusieurs dates, prends la plus éloignée (DLUO). Si tu ne trouves pas, réponds NON.`;
-          let rep = await appelVisionIA(base64, prompt);
-          if (!rep) {
-            // Fallback Tesseract + regex
-            showToast('🔍 Lecture OCR…');
-            const texte = await ocrFallback(file);
-            rep = texte ? (extraireDateDuTexte(texte) || 'NON') : 'NON';
-          }
-          if (rep && rep !== 'NON') {
-            const m = rep.match(/\d{4}-\d{2}-\d{2}/);
-            if (m) {
-              document.getElementById('date_p').value = m[0];
-              showToast('✅ Date lue : ' + m[0]);
-            } else { showToast('⚠️ Format inattendu : ' + rep); }
-          } else {
-            showToast('⚠️ Aucune date trouvée — cadre bien sur la date');
-          }
-        } catch(e) { showToast('❌ Erreur : ' + e.message); }
-        finally { btn.innerHTML = original; btn.disabled = false; }
-      }
-
-      // ─── Compression image avant upload (canvas JPEG) ────────────────────────
-      async function compresserImage(file, maxWidth = 800, qualite = 0.75) {
-        return new Promise((resolve) => {
-          const img = new Image();
-          const blobUrl = URL.createObjectURL(file);
-          img.onload = () => {
-            URL.revokeObjectURL(blobUrl);
-            let { width, height } = img;
-            if (width > maxWidth) {
-              height = Math.round(height * maxWidth / width);
-              width = maxWidth;
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-            canvas.toBlob(blob => resolve(blob), 'image/jpeg', qualite);
-          };
-          img.src = blobUrl;
-        });
-      }
-
-      async function uploaderPhotoLieu(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const { lieu, souslieu } = photoLieuCourant;
-        showToast('⏳ Upload en cours...');
-        try {
-          const compressed = await compresserImage(file, 400, 0.72);
-          const name = `lieu_${Date.now()}.jpg`;
-          await supabaseClient.storage.from('photos').upload(name, compressed, { contentType: 'image/jpeg' });
-          const url = supabaseClient.storage.from('photos').getPublicUrl(name).data.publicUrl;
-          await supabaseClient.from('lieux_photos').upsert(
-            { lieu, sous_lieu: souslieu || '', photo_url: url },
-            { onConflict: 'lieu,sous_lieu' }
-          );
-          cachedLieuxPhotos[lieu.toUpperCase() + '|' + (souslieu || '')] = url;
-          showToast('✅ Photo enregistrée !');
-          chargerListe();
-        } catch(e) {
-          showToast('❌ Erreur : ' + e.message);
-        }
-      }
-
-      let lessiveInterval = null;
-
-      function switchTab(tab) {
-        tabActuel = tab;
-        document.getElementById('section-inventaire').style.display = tab === 'inventaire' ? '' : 'none';
-        document.getElementById('section-courses').style.display = tab === 'courses' ? '' : 'none';
-        document.getElementById('section-recettes').style.display = tab === 'recettes' ? '' : 'none';
-        document.getElementById('section-lessive').style.display = tab === 'lessive' ? '' : 'none';
-        document.getElementById('nav-inventaire').classList.toggle('active', tab === 'inventaire');
-        document.getElementById('nav-courses').classList.toggle('active', tab === 'courses');
-        document.getElementById('nav-recettes').classList.toggle('active', tab === 'recettes');
-        document.getElementById('nav-lessive').classList.toggle('active', tab === 'lessive');
-
-        document.getElementById('fab-btn').style.display = tab === 'lessive' ? 'none' : '';
-
-        if (tab === 'courses') {
-          chargerCourses(true);
-        } else if (tab === 'recettes') {
-          chargerRecettes();
-        } else if (tab === 'lessive') {
-          calculerLessive();
-          clearInterval(lessiveInterval);
-          lessiveInterval = setInterval(calculerLessive, 10000);
-        } else {
-          clearInterval(lessiveInterval);
-        }
-      }
-
-      function nouveauProduitOuCourse() {
-        if (tabActuel === 'inventaire') nouveauProduit();
-        else if (tabActuel === 'recettes') ouvrirModalRecette();
-        else ouvrirModalCourse();
-      }
-
-      function ouvrirModalCourse() {
-        idModifCourse = null;
-        document.getElementById('course-nom').value = '';
-        document.getElementById('course-quantite').value = '1';
-        document.getElementById('course-magasin').value = '';
-        document.getElementById('modal-course-title').innerText = 'Ajouter un article';
-        document.getElementById('course-btn').innerHTML = '🛒 Ajouter';
-        document.getElementById('course-btn').className = 'btn-save';
-        document.getElementById('modal-course').classList.add('active');
-        document.body.style.overflow = 'hidden';
-        setTimeout(() => document.getElementById('course-nom').focus(), 100);
-      }
-
-      function fermerModalCourse(e) {
-        if (e && e.target !== document.getElementById('modal-course') && e.type === 'click') return;
-        document.getElementById('modal-course').classList.remove('active');
-        document.body.style.overflow = 'auto';
-      }
-
-      async function chargerCourses(forceReload = false) {
-        if (cachedCourses && !forceReload) { afficherCourses(); return; }
-        const { data } = await supabaseClient
-          .from('liste_courses')
-          .select('*')
-          .order('achete', { ascending: true })
-          .order('nom', { ascending: true });
-        cachedCourses = data || [];
-        afficherCourses();
-        updateCoursesBadge();
-      }
-
-      function afficherCourses() {
-        const container = document.getElementById('liste-courses');
-        const progressEl = document.getElementById('courses-progress');
-        if (!cachedCourses || cachedCourses.length === 0) {
-          container.innerHTML = `<div class="courses-empty">
-            <span class="empty-icon">🛒</span>
-            <div class="empty-title">La liste est vide !</div>
-            <div class="empty-sub">Appuyez sur + pour ajouter un article</div>
-          </div>`;
-          if (progressEl) progressEl.innerText = '';
-          return;
-        }
-        const total = cachedCourses.length;
-        const achetes = cachedCourses.filter(c => c.achete).length;
-        if (progressEl) progressEl.innerText = `${achetes} / ${total} article${total > 1 ? 's' : ''} acheté${achetes > 1 ? 's' : ''}`;
-
-        // Alimenter datalist magasins
-        const magasinsSet = new Set(cachedCourses.filter(c => c.magasin).map(c => c.magasin));
-        const listMagasins = document.getElementById('list-magasins');
-        if (listMagasins) listMagasins.innerHTML = [...magasinsSet].map(m => `<option value="${escHtml(m)}">`).join('');
-        const listNomsCourse = document.getElementById('list-course-noms');
-        if (listNomsCourse) listNomsCourse.innerHTML = [...new Set(cachedCourses.map(c => c.nom))].map(n => `<option value="${escHtml(n)}">`).join('');
-
-        // Grouper par magasin (sans magasin en premier)
-        const parMagasin = {};
-        cachedCourses.forEach(c => {
-          const key = c.magasin || '';
-          if (!parMagasin[key]) parMagasin[key] = [];
-          parMagasin[key].push(c);
-        });
-        const keys = Object.keys(parMagasin).sort((a, b) => {
-          if (a === '') return -1;
-          if (b === '') return 1;
-          return a.localeCompare(b, 'fr');
-        });
-
-        let html = '';
-        keys.forEach(magasin => {
-          if (magasin) html += `<div class="courses-group-header">🏪 ${escHtml(magasin)}</div>`;
-          parMagasin[magasin].forEach(c => { html += renderCourseItem(c); });
-        });
-        container.innerHTML = html;
-      }
-
-      function renderCourseItem(c) {
-        const acheClass = c.achete ? 'achete' : '';
-        const checkedClass = c.achete ? 'checked' : '';
-        const checkIcon = c.achete ? '✓' : '';
-        const magasinBadge = c.magasin ? `<span class="course-magasin">🏪 ${escHtml(c.magasin)}</span>` : '';
-        const nomEsc = c.nom.replace(/'/g, "\\'");
-        return `<div class="course-item ${acheClass}">
-          <div class="course-checkbox ${checkedClass}" onclick="toggleAchete('${c.id}', ${c.achete})">${checkIcon}</div>
-          <div class="course-info" onclick="preparerModifCourse('${c.id}')">
-            <div class="course-nom">${escHtml(c.nom)}</div>
-            <div class="course-meta">
-              <span class="course-qty">×${c.quantite || 1}</span>
-              ${magasinBadge}
-            </div>
-          </div>
-          <button class="course-btn-del" onclick="supprimerCourse('${c.id}', '${nomEsc}')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14H6L5,6"/><path d="M10,11v6"/><path d="M14,11v6"/><path d="M9,6V4h6v2"/></svg>
-          </button>
-        </div>`;
-      }
-
-      async function toggleAchete(id, currentVal) {
-        const newVal = !currentVal;
-        await supabaseClient.from('liste_courses').update({ achete: newVal }).eq('id', id);
-        if (cachedCourses) {
-          const item = cachedCourses.find(c => c.id === id);
-          if (item) item.achete = newVal;
-        }
-        afficherCourses();
-        updateCoursesBadge();
-      }
-
-      async function ajouterCourse() {
-        const nom = document.getElementById('course-nom').value.trim();
-        const quantite = parseInt(document.getElementById('course-quantite').value) || 1;
-        const magasin = document.getElementById('course-magasin').value.trim() || null;
-        if (!nom) { showToast("⚠️ Le nom de l'article est obligatoire !"); return; }
-
-        const btn = document.getElementById('course-btn');
-        const btnText = btn.innerHTML;
-        btn.innerHTML = '⏳ En cours...';
-        btn.disabled = true;
-        try {
-          if (idModifCourse) {
-            await supabaseClient.from('liste_courses').update({ nom, quantite, magasin }).eq('id', idModifCourse);
-            showToast('✅ Article modifié !');
-          } else {
-            await supabaseClient.from('liste_courses').insert([{ nom, quantite, magasin, achete: false }]);
-            showToast('✅ Article ajouté à la liste !');
-            notifierNouvelArticleCourses(nom);
-          }
-          fermerModalCourse();
-          await chargerCourses(true);
-        } catch (e) {
-          showToast('❌ Erreur : ' + e.message);
-        } finally {
-          btn.innerHTML = btnText;
-          btn.disabled = false;
-        }
-      }
-
-      function preparerModifCourse(id) {
-        const item = cachedCourses && cachedCourses.find(c => c.id === id);
-        if (!item) return;
-        idModifCourse = id;
-        document.getElementById('course-nom').value = item.nom;
-        document.getElementById('course-quantite').value = item.quantite || 1;
-        document.getElementById('course-magasin').value = item.magasin || '';
-        document.getElementById('modal-course-title').innerText = "Modifier l'article";
-        const btn = document.getElementById('course-btn');
-        btn.innerHTML = '🔄 Mettre à jour';
-        btn.className = 'btn-save edit-mode';
-        document.getElementById('modal-course').classList.add('active');
-        document.body.style.overflow = 'hidden';
-      }
-
-      async function supprimerCourse(id, nom) {
-        if (confirm('Supprimer "' + nom + '" de la liste ?')) {
-          await supabaseClient.from('liste_courses').delete().eq('id', id);
-          showToast('🗑️ Article supprimé');
-          await chargerCourses(true);
-        }
-      }
-
-      async function reinitialiserCourses() {
-        const restants = cachedCourses ? cachedCourses.filter(c => c.achete).length : 0;
-        if (restants === 0) { showToast('ℹ️ Aucun article coché'); return; }
-        if (!confirm('Décocher tous les articles achetés ?')) return;
-        await supabaseClient.from('liste_courses').update({ achete: false }).eq('achete', true);
-        await chargerCourses(true);
-        showToast('✅ Liste réinitialisée !');
-      }
-
-      function updateCoursesBadge() {
-        const badge = document.getElementById('nav-courses-badge');
-        if (!badge || !cachedCourses) return;
-        const restants = cachedCourses.filter(c => !c.achete).length;
-        badge.style.display = restants > 0 ? '' : 'none';
-        badge.innerText = restants;
-      }
-
-      // Synchronisation temps réel — toute la famille voit les changements instantanément
-      supabaseClient
-        .channel('liste_courses_realtime')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'liste_courses' }, async () => {
-          await chargerCourses(true);
-        })
-        .subscribe();
-
-      // ===== NOTIFICATIONS DE PÉREMPTION =====
+      // ---- NOTIFICATIONS DE PÉREMPTION ----
       const VAPID_PUBLIC = 'BGiwV75qIldzegVA3UlJpovjYZ9mKlSXOjLp9jn9hkuM82ZC1m1Gan1UaeIwAP9mDZCqQaKtJsRdTDboDfRY818';
       const NOTIF_SEUIL_KEY = 'notif_seuil_pivert';
       const NOTIF_LAST_KEY = 'notif_last_pivert';
@@ -2889,14 +1567,21 @@
       }
 
       async function initNotifications() {
-        document.getElementById('notif-seuil').value = getSeuilNotif();
-        if ('serviceWorker' in navigator && location.protocol !== 'null:' && location.protocol !== 'file:') {
-          try { await navigator.serviceWorker.register('./sw.js'); } catch(e) { console.warn('SW:', e); }
+        // Charger le seuil sauvegardé
+        const seuil = getSeuilNotif();
+        document.getElementById('notif-seuil').value = seuil;
+
+        // Enregistrer le service worker
+        if ('serviceWorker' in navigator) {
+          try {
+            await navigator.serviceWorker.register('./sw.js');
+          } catch(e) { console.warn('SW:', e); }
         }
+
         majStatutNotif();
+
+        // Vérification automatique une fois par jour si autorisé
         if (Notification.permission === 'granted') {
-          // Vérifier et restaurer l'abonnement push si iOS l'a invalidé
-          await refreshAbonnementPush();
           const lastCheck = localStorage.getItem(NOTIF_LAST_KEY);
           const today = new Date().toDateString();
           if (lastCheck !== today) {
@@ -2906,46 +1591,19 @@
         }
       }
 
-      // Vérifie que l'abonnement push est toujours enregistré dans Supabase.
-      // iOS peut invalider les subscriptions silencieusement — cette fonction
-      // les restaure automatiquement à chaque ouverture de l'app.
-      async function refreshAbonnementPush() {
-        if (!('PushManager' in window) || !('serviceWorker' in navigator)) return;
-        try {
-          const sw = await navigator.serviceWorker.ready;
-          const sub = await sw.pushManager.getSubscription();
-          if (!sub) return; // pas d'abonnement local, rien à faire
-
-          const { endpoint, keys } = sub.toJSON();
-          const { data } = await supabaseClient
-            .from('push_subscriptions')
-            .select('endpoint')
-            .eq('endpoint', endpoint)
-            .maybeSingle();
-
-          if (!data) {
-            // L'abonnement a disparu de Supabase (expiré côté serveur) → on le recrée
-            const { error } = await supabaseClient
-              .from('push_subscriptions')
-              .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id: getDeviceId() }, { onConflict: 'endpoint' });
-            if (!error) console.info('Push subscription restaurée automatiquement.');
-          }
-        } catch(e) {
-          console.warn('refreshAbonnementPush:', e);
-        }
-      }
-
       function majStatutNotif() {
         const dot = document.getElementById('notif-dot');
         const txt = document.getElementById('notif-status-text');
         const btn = document.getElementById('btn-activer-notif');
         const bellBtn = document.getElementById('btn-notif');
+
         if (!('Notification' in window) || !('serviceWorker' in navigator)) {
           dot.className = 'notif-status-dot denied';
           txt.textContent = 'Non supporté par ce navigateur';
           btn.disabled = true;
           return;
         }
+
         if (Notification.permission === 'granted') {
           dot.className = 'notif-status-dot granted';
           txt.textContent = 'Notifications activées ✓';
@@ -2965,25 +1623,39 @@
       }
 
       async function activerNotifications() {
-        if (!('Notification' in window)) { showToast('❌ Non supporté sur ce navigateur'); return; }
+        if (!('Notification' in window)) {
+          showToast('❌ Non supporté sur ce navigateur');
+          return;
+        }
+
         const permission = await Notification.requestPermission();
-        if (permission !== 'granted') { showToast('❌ Permission refusée'); majStatutNotif(); return; }
+        if (permission !== 'granted') {
+          showToast('❌ Permission refusée');
+          majStatutNotif();
+          return;
+        }
+
+        // S'abonner aux push notifications
         try {
           const sw = await navigator.serviceWorker.ready;
           const subscription = await sw.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
           });
+
+          // Sauvegarder l'abonnement dans Supabase
           const { endpoint, keys } = subscription.toJSON();
           const { error } = await supabaseClient
             .from('push_subscriptions')
-            .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id: getDeviceId() }, { onConflict: 'endpoint' });
+            .upsert({ endpoint, p256dh: keys.p256dh, auth: keys.auth }, { onConflict: 'endpoint' });
+
           if (error) throw error;
           showToast('✅ Notifications activées !');
           await verifierPeremptions(false);
         } catch(e) {
           showToast('❌ Erreur abonnement : ' + e.message);
         }
+
         majStatutNotif();
       }
 
@@ -3004,9 +1676,13 @@
           if (!silencieux) afficherResultatsNotif([], []);
           return;
         }
+
         const seuil = getSeuilNotif();
-        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
         const expires = [], bientot = [];
+
         cachedInventaire.forEach(item => {
           if (!item.date_peremption) return;
           const exp = new Date(item.date_peremption);
@@ -3014,13 +1690,18 @@
           if (diff < 0) expires.push({ ...item, diff });
           else if (diff <= seuil) bientot.push({ ...item, diff });
         });
+
         if (!silencieux) afficherResultatsNotif(expires, bientot);
+
+        // Notification système si au moins 1 objet à signaler
         const total = expires.length + bientot.length;
         if (total === 0 || Notification.permission !== 'granted') return;
+
         const titre = `⚠️ ${total} objet${total > 1 ? 's' : ''} à vérifier`;
         const lignes = [];
         if (expires.length) lignes.push(`Expirés : ${expires.slice(0, 3).map(i => i.nom).join(', ')}`);
         if (bientot.length) lignes.push(`Bientôt : ${bientot.slice(0, 3).map(i => `${i.nom} (J-${i.diff})`).join(', ')}`);
+
         try {
           const sw = await navigator.serviceWorker.ready;
           sw.showNotification(titre, {
@@ -3040,6 +1721,7 @@
           container.innerHTML = '<div class="notif-empty">✅ Aucun objet à signaler</div>';
           return;
         }
+
         let html = '';
         if (expires.length > 0) {
           html += '<div class="notif-section-title">🔴 Expirés</div>';
@@ -3064,319 +1746,7 @@
         container.innerHTML = html;
       }
 
-      // ===== RECETTES =====
-      let cachedRecettes = null;
-      let idModifRecette = null;
-
-      const AIRFRYERS = [
-        { key: 'ninja_combi',  id: 'ninja-combi',  label: 'Ninja Combi 12-en-1' },
-        { key: 'philips',      id: 'philips',       label: 'Philips classique' },
-        { key: 'ninja_crispi', id: 'ninja-crispi',  label: 'Ninja Crispi' },
-      ];
-
-      async function chargerRecettes(forceReload = false) {
-        if (cachedRecettes && !forceReload) { afficherRecettes(); return; }
-        const { data } = await supabaseClient.from('recettes').select('*').order('created_at', { ascending: false });
-        cachedRecettes = data || [];
-        afficherRecettes();
-      }
-
-      function afficherRecettes() {
-        const container = document.getElementById('liste-recettes');
-        if (!cachedRecettes || cachedRecettes.length === 0) {
-          container.innerHTML = `<div class="recettes-empty">
-            <span class="empty-icon">📖</span>
-            <div class="empty-title">Aucune recette pour l'instant</div>
-            <div class="empty-sub">Appuie sur + pour ajouter ta première recette</div>
-          </div>`;
-          return;
-        }
-        container.innerHTML = '<div class="recettes-grid">' +
-          cachedRecettes.map(r => `
-            <div class="recette-card" onclick="ouvrirDetailRecette('${r.id}')">
-              ${r.image_url
-                ? `<img class="recette-card-img" src="${escHtml(r.image_url)}" loading="lazy" alt="${escHtml(r.nom)}">`
-                : `<div class="recette-card-no-img">🍽️</div>`}
-              <div class="recette-card-body">
-                <div class="recette-card-nom">${escHtml(r.nom)}</div>
-                ${r.description ? `<div class="recette-card-desc">${escHtml(r.description)}</div>` : ''}
-              </div>
-            </div>`).join('') +
-          '</div>';
-      }
-
-      function ouvrirModalRecette(recette = null) {
-        idModifRecette = recette ? recette.id : null;
-        document.getElementById('modal-recette-title').innerText = recette ? 'Modifier la recette' : 'Nouvelle recette';
-        document.getElementById('recette-nom').value = recette?.nom || '';
-        document.getElementById('recette-desc').value = recette?.description || '';
-        document.getElementById('recette-ingredients').value = recette?.ingredients || '';
-        document.getElementById('recette-instructions').value = recette?.instructions || '';
-        document.getElementById('recette-photo-label').innerText = '📷 Prendre ou choisir une photo';
-        document.getElementById('recette-photo').value = '';
-        document.getElementById('recette-btn').innerHTML = recette ? '✏️ Modifier' : '➕ Ajouter';
-
-        AIRFRYERS.forEach(af => {
-          const c = recette?.cuisson?.[af.key] || {};
-          document.getElementById(`af-${af.id}-mode`).value = c.mode || '';
-          document.getElementById(`af-${af.id}-temp`).value = c.temperature || '';
-          document.getElementById(`af-${af.id}-duree`).value = c.duree || '';
-        });
-
-        document.getElementById('modal-recette').classList.add('active');
-        document.body.style.overflow = 'hidden';
-        setTimeout(() => document.getElementById('recette-nom').focus(), 100);
-      }
-
-      function fermerModalRecette(e) {
-        if (e && e.target !== document.getElementById('modal-recette')) return;
-        document.getElementById('modal-recette').classList.remove('active');
-        document.body.style.overflow = 'auto';
-      }
-
-      function majLabelPhotoRecette() {
-        const file = document.getElementById('recette-photo').files[0];
-        document.getElementById('recette-photo-label').innerText = file ? '✅ ' + file.name : '📷 Prendre ou choisir une photo';
-      }
-
-      async function sauvegarderRecette() {
-        const nom = document.getElementById('recette-nom').value.trim();
-        if (!nom) { showToast('⚠️ Le nom est obligatoire'); return; }
-
-        const btn = document.getElementById('recette-btn');
-        btn.innerHTML = '⏳ En cours...'; btn.disabled = true;
-
-        try {
-          let image_url = idModifRecette ? (cachedRecettes.find(r => r.id === idModifRecette)?.image_url || null) : null;
-          const file = document.getElementById('recette-photo').files[0];
-          if (file) {
-            const name = `recette_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-            await supabaseClient.storage.from('photos').upload(name, file);
-            image_url = supabaseClient.storage.from('photos').getPublicUrl(name).data.publicUrl;
-          }
-
-          const cuisson = {};
-          AIRFRYERS.forEach(af => {
-            const mode = document.getElementById(`af-${af.id}-mode`).value.trim();
-            const temp = parseInt(document.getElementById(`af-${af.id}-temp`).value);
-            const duree = parseInt(document.getElementById(`af-${af.id}-duree`).value);
-            if (mode || temp || duree) {
-              cuisson[af.key] = { mode: mode || null, temperature: temp || null, duree: duree || null };
-            }
-          });
-
-          const payload = {
-            nom,
-            description: document.getElementById('recette-desc').value.trim() || null,
-            ingredients: document.getElementById('recette-ingredients').value.trim() || null,
-            instructions: document.getElementById('recette-instructions').value.trim() || null,
-            image_url,
-            cuisson,
-          };
-
-          if (idModifRecette) {
-            await supabaseClient.from('recettes').update(payload).eq('id', idModifRecette);
-            showToast('✅ Recette modifiée !');
-          } else {
-            await supabaseClient.from('recettes').insert([payload]);
-            showToast('✅ Recette ajoutée !');
-          }
-
-          document.getElementById('modal-recette').classList.remove('active');
-          document.body.style.overflow = 'auto';
-          await chargerRecettes(true);
-        } catch(e) {
-          showToast('❌ Erreur : ' + e.message);
-        } finally {
-          btn.innerHTML = idModifRecette ? '✏️ Modifier' : '➕ Ajouter';
-          btn.disabled = false;
-        }
-      }
-
-      function ouvrirDetailRecette(id) {
-        const r = cachedRecettes && cachedRecettes.find(r => r.id === id);
-        if (!r) return;
-
-        const afHtml = AIRFRYERS
-          .filter(af => r.cuisson && r.cuisson[af.key])
-          .map(af => {
-            const c = r.cuisson[af.key];
-            const infos = [
-              c.mode ? `🔧 ${escHtml(c.mode)}` : '',
-              c.temperature ? `🌡️ ${c.temperature}°C` : '',
-              c.duree ? `⏱️ ${c.duree} min` : '',
-            ].filter(Boolean).join('  ');
-            return `<div class="airfryer-detail-card">
-              <div class="airfryer-detail-nom">${escHtml(af.label)}</div>
-              <div class="airfryer-detail-info">${infos}</div>
-            </div>`;
-          }).join('');
-
-        document.getElementById('recette-detail-content').innerHTML = `
-          ${r.image_url ? `<img class="recette-detail-img" src="${escHtml(r.image_url)}" alt="${escHtml(r.nom)}">` : ''}
-          <div class="recette-detail-nom">${escHtml(r.nom)}</div>
-          ${r.description ? `<div class="recette-detail-desc">${escHtml(r.description)}</div>` : ''}
-          ${r.ingredients ? `<div class="recette-detail-section">
-            <div class="recette-detail-section-title">Ingrédients</div>
-            <div class="recette-detail-text">${escHtml(r.ingredients)}</div>
-          </div>` : ''}
-          ${r.instructions ? `<div class="recette-detail-section">
-            <div class="recette-detail-section-title">Instructions</div>
-            <div class="recette-detail-text">${escHtml(r.instructions)}</div>
-          </div>` : ''}
-          ${afHtml ? `<div class="recette-detail-section">
-            <div class="recette-detail-section-title">Réglages air fryer</div>
-            ${afHtml}
-          </div>` : ''}
-          <div class="recette-detail-actions">
-            <button class="btn-save" onclick="fermerModalRecetteDetail();ouvrirModalRecette(cachedRecettes.find(r=>r.id==='${r.id}'))">✏️ Modifier</button>
-            <button class="btn-save" style="background:var(--accent-color);flex:0 0 auto" onclick="document.getElementById('recette-detail-photo-input').dataset.id='${r.id}';document.getElementById('recette-detail-photo-input').click()">📷 ${r.image_url ? 'Changer' : 'Ajouter une photo'}</button>
-            <button class="btn-delete-recette" onclick="supprimerRecette('${r.id}')">🗑️ Supprimer</button>
-          </div>`;
-
-        document.getElementById('modal-recette-detail').classList.add('active');
-        document.body.style.overflow = 'hidden';
-      }
-
-      function fermerModalRecetteDetail(e) {
-        if (e && e.target !== document.getElementById('modal-recette-detail')) return;
-        document.getElementById('modal-recette-detail').classList.remove('active');
-        document.body.style.overflow = 'auto';
-      }
-
-      async function uploaderPhotoRecette(input) {
-        const file = input.files[0];
-        const id = input.dataset.id;
-        if (!file || !id) return;
-        input.value = '';
-        showToast('⏳ Upload en cours…');
-        try {
-          const compressed = await compresserImage(file, 800, 0.75);
-          const name = `recettes/${id}_${Date.now()}.jpg`;
-          await supabaseClient.storage.from('photos').upload(name, compressed, { contentType: 'image/jpeg' });
-          const url = supabaseClient.storage.from('photos').getPublicUrl(name).data.publicUrl;
-          await supabaseClient.from('recettes').update({ image_url: url }).eq('id', id);
-          // Met à jour le cache local
-          const r = cachedRecettes.find(r => r.id === id);
-          if (r) r.image_url = url;
-          showToast('📷 Photo ajoutée !');
-          ouvrirDetailRecette(id);
-        } catch (e) {
-          showToast('❌ Erreur upload : ' + e.message);
-        }
-      }
-
-      async function supprimerRecette(id) {
-        if (!confirm('Supprimer cette recette ?')) return;
-        await supabaseClient.from('recettes').delete().eq('id', id);
-        fermerModalRecetteDetail();
-        showToast('🗑️ Recette supprimée');
-        await chargerRecettes(true);
-      }
-
-      async function suggererRecetteIA() {
-        if (typeof OPENROUTER_KEY === 'undefined' || OPENROUTER_KEY === 'COLLE_TA_CLÉ_ICI') {
-          showToast('⚠️ Clé OpenRouter manquante dans config.local.js');
-          return;
-        }
-
-        const btnIA = document.querySelector('.btn-ia-recette');
-        const texteOriginal = btnIA.innerHTML;
-        btnIA.innerHTML = '⏳ En cours…';
-        btnIA.disabled = true;
-
-        try {
-          // Récupère les noms des articles de l'inventaire comme base d'ingrédients
-          const { data: inventaire } = await supabaseClient
-            .from('inventaire')
-            .select('nom')
-            .order('created_at', { ascending: false })
-            .limit(30);
-
-          const ingredients = (inventaire || []).map(i => i.nom);
-          const listeIngredients = ingredients.length
-            ? ingredients.join(', ')
-            : 'ingrédients variés du placard';
-
-          const prompt = `Tu es un assistant culinaire. Propose UNE recette adaptée à l'air fryer en utilisant tout ou partie de ces ingrédients : ${listeIngredients}.
-
-Réponds UNIQUEMENT en JSON valide avec exactement ces champs :
-{
-  "nom": "Nom de la recette",
-  "description": "Courte description appétissante (1 phrase)",
-  "ingredients": "liste des ingrédients avec quantités, un par ligne",
-  "instructions": "étapes numérotées, une par ligne",
-  "cuisson": {
-    "ninja_combi": { "mode": "Air Fry", "temperature": 180, "duree": 25 },
-    "philips": { "mode": "Air Fry", "temperature": 180, "duree": 25 },
-    "ninja_crispi": { "mode": "Air Fry", "temperature": 180, "duree": 25 }
-  }
-}`;
-
-          const MODELS = [
-            'google/gemma-4-31b-it:free',
-            'google/gemma-4-26b-a4b-it:free',
-            'nvidia/nemotron-3-super-120b-a12b:free',
-            'inclusionai/ling-2.6-flash:free',
-          ];
-
-          let data = null;
-          for (const model of MODELS) {
-            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${OPENROUTER_KEY}`,
-                'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://lamaisondespiverts.netlify.app',
-                'X-Title': 'La Maison des Piverts',
-              },
-              body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }] }),
-            });
-            if (res.ok) { data = await res.json(); break; }
-            const errBody = await res.text();
-            if (res.status !== 429 && res.status !== 404) throw new Error(`API ${res.status} : ${errBody}`);
-          }
-          if (!data) throw new Error('Tous les modèles gratuits sont surchargés, réessaie dans 1 minute.');
-          const raw = data.choices[0].message.content;
-          // Extrait le JSON même s'il est entouré de markdown ```json ... ```
-          const jsonMatch = raw.match(/\{[\s\S]*\}/);
-          if (!jsonMatch) throw new Error('Réponse IA non parseable');
-          const recette = JSON.parse(jsonMatch[0]);
-
-          // Pré-remplit le formulaire et ouvre le modal
-          ouvrirModalRecette();
-          document.getElementById('modal-recette-title').innerText = '✨ Recette suggérée par l\'IA';
-          document.getElementById('recette-nom').value = recette.nom || '';
-          document.getElementById('recette-desc').value = recette.description || '';
-          document.getElementById('recette-ingredients').value = recette.ingredients || '';
-          document.getElementById('recette-instructions').value = recette.instructions || '';
-
-          if (recette.cuisson) {
-            AIRFRYERS.forEach(af => {
-              const c = recette.cuisson[af.key] || {};
-              const modeEl = document.getElementById(`af-${af.id}-mode`);
-              const tempEl = document.getElementById(`af-${af.id}-temp`);
-              const dureeEl = document.getElementById(`af-${af.id}-duree`);
-              if (modeEl) modeEl.value = c.mode || '';
-              if (tempEl) tempEl.value = c.temperature || '';
-              if (dureeEl) dureeEl.value = c.duree || '';
-            });
-          }
-
-          showToast('✨ Recette générée ! Vérifie et sauvegarde.');
-        } catch (e) {
-          console.error(e);
-          showToast('❌ Erreur IA : ' + e.message);
-        } finally {
-          btnIA.innerHTML = texteOriginal;
-          btnIA.disabled = false;
-        }
-      }
-
-      loadTheme();
-      chargerLieuxPhotos().then(chargerListe);
       initNotifications();
-      chargerCourses(true);
     </script>
   </body>
 </html>

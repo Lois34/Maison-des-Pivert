@@ -12,18 +12,7 @@ jobs:
     steps:
       - name: Appeler la fonction Edge de notifications
         run: |
-          echo "Appel de la Edge Function push-notif..."
-          RESPONSE=$(curl -s -X POST \
+          curl -s -X POST \
             "${{ secrets.SUPABASE_URL }}/functions/v1/push-notif" \
             -H "Authorization: Bearer ${{ secrets.FUNCTION_SECRET }}" \
-            -H "Content-Type: application/json" \
-            -w "\n%{http_code}")
-          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | head -n -1)
-          echo "Réponse : $BODY"
-          echo "HTTP Status : $HTTP_CODE"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "ERREUR : la Edge Function a retourné HTTP $HTTP_CODE"
-            exit 1
-          fi
-          echo "Succès : notifications envoyées."
+            -H "Content-Type: application/json"
