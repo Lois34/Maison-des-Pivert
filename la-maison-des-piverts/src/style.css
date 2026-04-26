@@ -1,0 +1,88 @@
+/* ================================================================
+   La Maison des Piverts — Système de design "Forêt Close"
+   Palette chaleureuse, typographie éditoriale, esprit maison française
+   ================================================================ */
+
+:root {
+  /* ── Palette ─────────────────────────────────────────────── */
+  --moss:         #2A4D20;
+  --moss-hover:   #1e3a17;
+  --moss-light:   #3d6e31;
+  --leaf:         #5C8F50;
+  --sage:         #97BC8D;
+  --sage-pale:    #D6E9D0;
+  --bark:         #8C6445;
+  --parchment:    #F4EFE6;
+  --cream:        #FDFAF5;
+  --sand:         #E8DFC8;
+  --sand-light:   #F0EBE0;
+  --ink:          #1C1A12;
+  --stone:        #6B6456;
+  --stone-light:  #A09880;
+  --danger:       #B83C3C;
+  --danger-pale:  rgba(184, 60, 60, 0.08);
+  --warning:      #C47B2A;
+
+  /* ── Ombres chaudes (teintées vert) ──────────────────────── */
+  --shadow-xs: 0 1px 3px rgba(42, 77, 32, 0.07);
+  --shadow-sm: 0 2px 8px rgba(42, 77, 32, 0.09);
+  --shadow-md: 0 6px 20px rgba(42, 77, 32, 0.13);
+  --shadow-lg: 0 14px 40px rgba(42, 77, 32, 0.16);
+  --shadow-fab: 0 8px 28px rgba(42, 77, 32, 0.45);
+
+  /* ── Typographie ─────────────────────────────────────────── */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-ui:      'Nunito', system-ui, sans-serif;
+
+  /* ── Rayons ──────────────────────────────────────────────── */
+  --r-sm:   10px;
+  --r-md:   16px;
+  --r-lg:   22px;
+  --r-xl:   28px;
+  --r-pill: 100px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--parchment);
+  color: var(--ink);
+  line-height: 1.5;
+  /* espace pour la navigation basse + safe area iOS */
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  min-height: 100svh;
+}
+
+/* Grain texture subtile sur le fond */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(90, 143, 80, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(140, 100, 69, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Utilitaires globaux ──────────────────────────────────── */
+.display {
+  font-family: var(--font-display);
+}

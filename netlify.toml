@@ -1,0 +1,13 @@
+[build]
+  command = "cd la-maison-des-piverts && npm install && npm run build"
+  publish = "la-maison-des-piverts/dist"
+  functions = "netlify/functions"
+
+[functions.ia-proxy]
+  timeout = 20
+
+# Vue Router — redirige toutes les routes vers index.html (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
