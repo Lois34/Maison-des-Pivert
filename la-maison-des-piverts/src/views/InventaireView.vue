@@ -6,7 +6,7 @@
       <div class="search-bar">
         <div class="search-input-wrap">
           <svg class="search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input v-model="recherche" type="text" placeholder="Rechercher un objet…" />
+          <input v-model="recherche" type="text" placeholder="Rechercher…" />
         </div>
         <select v-model="filtreZone">
           <option value="">Tous les lieux</option>
@@ -186,8 +186,13 @@
               <div class="field">
                 <label>Nom de l'objet</label>
                 <div class="field-row">
-                  <input v-model="form.nom" type="text" placeholder="Ex : Perceuse" list="list-noms" />
-                  <datalist id="list-noms"><option v-for="n in nomsSet" :key="n" :value="n" /></datalist>
+                  <div class="autocomplete-wrap" style="flex:1">
+                    <input v-model="form.nom" type="text" placeholder="Ex : Perceuse" autocomplete="off"
+                      @focus="acFocus='nom'" @blur="acBlur('nom')" />
+                    <ul v-if="acFocus==='nom' && acNoms.length" class="ac-dropdown">
+                      <li v-for="n in acNoms" :key="n" @mousedown.prevent="form.nom=n; acFocus=null">{{ n }}</li>
+                    </ul>
+                  </div>
                   <button type="button" class="btn-ia" @click="iaPhotoNomRef.click()">✨</button>
                   <input ref="iaPhotoNomRef" type="file" accept="image/*" capture="environment" style="display:none" @change="suggererNomAvecIA" />
                 </div>
@@ -195,14 +200,24 @@
 
               <div class="field">
                 <label>Lieu principal</label>
-                <input v-model="form.lieu" type="text" placeholder="Ex : Garage" list="list-lieux" />
-                <datalist id="list-lieux"><option v-for="l in zonesUniques" :key="l" :value="cap(l)" /></datalist>
+                <div class="autocomplete-wrap">
+                  <input v-model="form.lieu" type="text" placeholder="Ex : Garage" autocomplete="off"
+                    @focus="acFocus='lieu'" @blur="acBlur('lieu')" />
+                  <ul v-if="acFocus==='lieu' && acLieux.length" class="ac-dropdown">
+                    <li v-for="l in acLieux" :key="l" @mousedown.prevent="form.lieu=l; acFocus=null">{{ l }}</li>
+                  </ul>
+                </div>
               </div>
 
               <div class="field">
                 <label>Sous-lieu <span class="opt">optionnel</span></label>
-                <input v-model="form.sous_lieu" type="text" placeholder="Ex : Étagère du haut" list="list-sous-lieux" />
-                <datalist id="list-sous-lieux"><option v-for="sl in sousLieuxSet" :key="sl" :value="sl" /></datalist>
+                <div class="autocomplete-wrap">
+                  <input v-model="form.sous_lieu" type="text" placeholder="Ex : Étagère du haut" autocomplete="off"
+                    @focus="acFocus='sous_lieu'" @blur="acBlur('sous_lieu')" />
+                  <ul v-if="acFocus==='sous_lieu' && acSousLieux.length" class="ac-dropdown">
+                    <li v-for="sl in acSousLieux" :key="sl" @mousedown.prevent="form.sous_lieu=sl; acFocus=null">{{ sl }}</li>
+                  </ul>
+                </div>
               </div>
 
               <div class="field-row field-row--half">
@@ -299,12 +314,32 @@ let longPressTriggered = false
 
 const form = ref({ id: null, nom: '', lieu: '', sous_lieu: '', date_peremption: '', quantite: 1 })
 
+// ── Autocomplete ──────────────────────────────────────────────────────────────
+const acFocus = ref(null)
+
+function acBlur(champ) {
+  setTimeout(() => { if (acFocus.value === champ) acFocus.value = null }, 150)
+}
+
 // ── Computed ──────────────────────────────────────────────────────────────────
 const zonesUniques = computed(() =>
   [...new Set(inventaire.value.map(i => i.lieu.toUpperCase()))].sort()
 )
 const nomsSet = computed(() => [...new Set(inventaire.value.map(i => i.nom))])
 const sousLieuxSet = computed(() => [...new Set(inventaire.value.filter(i => i.sous_lieu).map(i => i.sous_lieu))])
+
+const acNoms = computed(() => {
+  const v = form.value.nom.toLowerCase()
+  return nomsSet.value.filter(n => n.toLowerCase().includes(v) && n !== form.value.nom).slice(0, 6)
+})
+const acLieux = computed(() => {
+  const v = form.value.lieu.toLowerCase()
+  return zonesUniques.value.map(l => cap(l)).filter(l => l.toLowerCase().includes(v) && l !== form.value.lieu).slice(0, 6)
+})
+const acSousLieux = computed(() => {
+  const v = form.value.sous_lieu.toLowerCase()
+  return sousLieuxSet.value.filter(s => s.toLowerCase().includes(v) && s !== form.value.sous_lieu).slice(0, 6)
+})
 
 const sousLieuxUniques = computed(() => {
   if (!filtreZone.value) return []
@@ -513,14 +548,15 @@ async function fileToBase64(file) {
   })
 }
 async function appelVisionIA(base64, prompt) {
-  const MODELS = ['meta-llama/llama-4-scout', 'meta-llama/llama-4-maverick', 'google/gemini-2.5-flash-preview']
-  for (const model of MODELS) {
-    try {
-      const res = await fetch('/.netlify/functions/ia-proxy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model, messages: [{ role: 'user', content: [{ type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64}` } }, { type: 'text', text: prompt }] }] }) })
-      const body = await res.json()
-      if (res.ok && body.choices?.[0]?.message?.content) return body.choices[0].message.content
-    } catch {}
-  }
+  try {
+    const res = await fetch('/.netlify/functions/ia-vision', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64, prompt })
+    })
+    const data = await res.json()
+    if (res.ok && data.result) return data.result
+  } catch {}
   return null
 }
 async function suggererNomAvecIA(e) {
@@ -528,18 +564,41 @@ async function suggererNomAvecIA(e) {
   iaLoading.value = true
   try {
     const base64 = await fileToBase64(file)
-    const r = await appelVisionIA(base64, 'Quel est le nom de ce produit ou objet ? UN seul mot ou nom court en français.')
-    if (r) form.value.nom = r.trim()
+    const r = await appelVisionIA(base64, 'Donne le nom générique du produit visible sur la photo (pas la marque, pas le fabricant). Exemples : "Lait", "Shampooing", "Pâtes", "Yaourt nature". Première lettre en majuscule, reste en minuscules. Aucun point, aucune ponctuation. Un seul mot ou groupe de mots très court.')
+    if (r) {
+      let nom = r.trim().replace(/[.!?,;:]+$/, '')
+      nom = nom.charAt(0).toUpperCase() + nom.slice(1).toLowerCase()
+      form.value.nom = nom
+    }
     photoFichier.value = file
     photoLabel.value = '✅ ' + file.name
   } finally { iaLoading.value = false }
 }
+async function appelVisionOpenRouter(base64, prompt) {
+  try {
+    const res = await fetch('/.netlify/functions/ia-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-4-scout',
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64}` } },
+          { type: 'text', text: prompt }
+        ]}]
+      })
+    })
+    const data = await res.json()
+    if (res.ok && data.choices?.[0]?.message?.content) return data.choices[0].message.content
+  } catch {}
+  return null
+}
+
 async function lireDatePeremptionIA(e) {
   const file = e.target.files[0]; if (!file) return
   iaLoading.value = true
   try {
     const base64 = await fileToBase64(file)
-    const r = await appelVisionIA(base64, 'Lis la date de péremption. Réponds UNIQUEMENT au format YYYY-MM-DD. Si introuvable : "non trouvée".')
+    const r = await appelVisionOpenRouter(base64, 'Lis la date de péremption. Réponds UNIQUEMENT au format YYYY-MM-DD. Si introuvable : "non trouvée".')
     if (r && r.trim() !== 'non trouvée') { const d = r.trim(); if (/^\d{4}-\d{2}-\d{2}$/.test(d)) form.value.date_peremption = d }
   } finally { iaLoading.value = false }
 }
@@ -602,6 +661,7 @@ onMounted(() => Promise.all([chargerDonnees(), chargerLieuxPhotos()]))
 
 .search-input-wrap {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -625,17 +685,21 @@ onMounted(() => Promise.all([chargerDonnees(), chargerLieuxPhotos()]))
 .search-input-wrap input::placeholder { color: var(--stone-light); }
 
 .search-bar select {
-  padding: 10px 14px;
+  padding: 10px 8px;
   border: none;
   border-radius: var(--r-lg);
   background: var(--parchment);
   font-family: var(--font-ui);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--stone);
   outline: none;
   cursor: pointer;
-  max-width: 130px;
+  flex-shrink: 1;
+  min-width: 60px;
+  max-width: 110px;
 }
+
+.vue-toggle { flex-shrink: 0; }
 
 .vue-toggle { display: flex; gap: 4px; }
 
@@ -927,6 +991,37 @@ onMounted(() => Promise.all([chargerDonnees(), chargerLieuxPhotos()]))
 }
 .fab:hover { background: var(--moss-hover); transform: scale(1.08); }
 .fab:active { transform: scale(0.95); }
+
+/* ── Autocomplete ───────────────────────────────────────────── */
+.autocomplete-wrap {
+  position: relative;
+  flex: 1;
+}
+.ac-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--cream);
+  border: 1.5px solid var(--leaf);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.ac-dropdown li {
+  padding: 11px 16px;
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ac-dropdown li:hover { background: var(--sage-pale); }
 
 /* ── Modal ─────────────────────────────────────────────────── */
 .modal-overlay {

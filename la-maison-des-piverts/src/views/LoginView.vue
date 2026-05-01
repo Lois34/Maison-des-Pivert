@@ -57,6 +57,7 @@
               type="text"
               inputmode="numeric"
               maxlength="1"
+              autocomplete="one-time-code"
               class="otp-input"
               :class="{ filled: otpDigits[i] }"
               @input="onOtpInput(i, $event)"

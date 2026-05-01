@@ -102,26 +102,29 @@
     <!-- Modal ajout / édition -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="modalOuvert" class="modal-overlay" @click.self="fermerModal">
+        <div v-if="modalOuvert" class="modal-overlay" :style="keyboardY ? { bottom: `${keyboardY}px` } : {}" @click.self="fermerModal">
           <div class="modal-sheet" role="dialog" aria-modal="true">
             <div class="modal-handle" />
             <h3 class="modal-title">{{ modeEdition ? "Modifier l'article" : 'Ajouter un article' }}</h3>
 
             <div class="field-group">
               <label class="field-label">Article</label>
-              <input
-                ref="inputNom"
-                v-model="form.nom"
-                type="text"
-                class="field-input"
-                placeholder="Ex : Lait, Pain…"
-                list="list-noms"
-                autocomplete="off"
-                @keydown.enter="sauvegarder"
-              />
-              <datalist id="list-noms">
-                <option v-for="n in nomsExistants" :key="n" :value="n" />
-              </datalist>
+              <div class="autocomplete-wrap">
+                <input
+                  ref="inputNom"
+                  v-model="form.nom"
+                  type="text"
+                  class="field-input"
+                  placeholder="Ex : Lait, Pain…"
+                  autocomplete="off"
+                  @focus="acFocus='nom'"
+                  @blur="acBlur('nom')"
+                  @keydown.enter="sauvegarder"
+                />
+                <ul v-if="acFocus==='nom' && acNoms.length" class="ac-dropdown">
+                  <li v-for="n in acNoms" :key="n" @mousedown.prevent="form.nom=n; acFocus=null">{{ n }}</li>
+                </ul>
+              </div>
             </div>
 
             <div class="field-row">
@@ -136,17 +139,20 @@
               </div>
               <div class="field-group field-group--half">
                 <label class="field-label">Magasin (optionnel)</label>
-                <input
-                  v-model="form.magasin"
-                  type="text"
-                  class="field-input"
-                  placeholder="Ex : Leclerc…"
-                  list="list-magasins"
-                  autocomplete="off"
-                />
-                <datalist id="list-magasins">
-                  <option v-for="m in magasinsExistants" :key="m" :value="m" />
-                </datalist>
+                <div class="autocomplete-wrap">
+                  <input
+                    v-model="form.magasin"
+                    type="text"
+                    class="field-input"
+                    placeholder="Ex : Leclerc…"
+                    autocomplete="off"
+                    @focus="acFocus='magasin'"
+                    @blur="acBlur('magasin')"
+                  />
+                  <ul v-if="acFocus==='magasin' && acMagasins.length" class="ac-dropdown">
+                    <li v-for="m in acMagasins" :key="m" @mousedown.prevent="form.magasin=m; acFocus=null">{{ m }}</li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -191,6 +197,7 @@ const inputNom = ref(null)
 
 const form = ref({ nom: '', quantite: 1, magasin: '' })
 const showAchetes = ref(false)
+const keyboardY = ref(0)
 
 // — Dérivés —
 const achetesCount = computed(() => courses.value.filter(c => c.achete).length)
@@ -222,8 +229,23 @@ const parMagasin = computed(() => {
   )
 })
 
-const nomsExistants = computed(() => [...new Set(courses.value.map(c => c.nom))])
-const magasinsExistants = computed(() => [...new Set(courses.value.filter(c => c.magasin).map(c => c.magasin))])
+const acFocus = ref(null)
+function acBlur(champ) {
+  setTimeout(() => { if (acFocus.value === champ) acFocus.value = null }, 150)
+}
+
+const acNoms = computed(() => {
+  const v = form.value.nom.toLowerCase()
+  return [...new Set(courses.value.map(c => c.nom))]
+    .filter(n => n.toLowerCase().includes(v) && n !== form.value.nom)
+    .slice(0, 6)
+})
+const acMagasins = computed(() => {
+  const v = form.value.magasin.toLowerCase()
+  return [...new Set(courses.value.filter(c => c.magasin).map(c => c.magasin))]
+    .filter(m => m.toLowerCase().includes(v) && m !== form.value.magasin)
+    .slice(0, 6)
+})
 
 // — Supabase —
 async function charger() {
@@ -272,9 +294,9 @@ async function sauvegarder() {
 
 async function supprimer(item) {
   if (!confirm(`Supprimer "${item.nom}" de la liste ?`)) return
+  courses.value = courses.value.filter(c => c.id !== item.id)
   await supabase.from('liste_courses').delete().eq('id', item.id)
   afficherToast('🗑️ Article supprimé')
-  await charger()
 }
 
 async function reinitialiser() {
@@ -328,18 +350,37 @@ function afficherToast(msg) {
 }
 
 // — Temps réel —
+function appliquerChangement(payload) {
+  if (payload.eventType === 'UPDATE') {
+    const idx = courses.value.findIndex(c => c.id === payload.new.id)
+    if (idx !== -1) courses.value[idx] = payload.new
+  } else if (payload.eventType === 'INSERT') {
+    if (!courses.value.find(c => c.id === payload.new.id)) courses.value.push(payload.new)
+  } else if (payload.eventType === 'DELETE') {
+    courses.value = courses.value.filter(c => c.id !== payload.old.id)
+  }
+}
+
 let channel
+let vpHandler = null
 onMounted(async () => {
   await charger()
   channel = supabase
     .channel('courses_realtime')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'liste_courses' }, charger)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'liste_courses' }, appliquerChangement)
     .subscribe()
+  if (window.visualViewport) {
+    vpHandler = () => {
+      keyboardY.value = Math.max(0, window.innerHeight - window.visualViewport.height)
+    }
+    window.visualViewport.addEventListener('resize', vpHandler)
+  }
 })
 
 onUnmounted(() => {
   if (channel) supabase.removeChannel(channel)
   clearTimeout(toastTimer.value)
+  if (window.visualViewport && vpHandler) window.visualViewport.removeEventListener('resize', vpHandler)
 })
 </script>
 
@@ -621,24 +662,20 @@ onUnmounted(() => {
   backdrop-filter: blur(3px);
   z-index: 600;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 .modal-sheet {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 480px;
   background: var(--cream);
-  border-radius: var(--r-xl) var(--r-xl) 0 0;
-  padding: 14px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  border-radius: var(--r-xl);
+  padding: 24px 20px;
   box-shadow: var(--shadow-lg);
+  position: relative;
 }
-.modal-handle {
-  width: 36px;
-  height: 4px;
-  background: var(--sand);
-  border-radius: 2px;
-  margin: 0 auto 20px;
-}
+.modal-handle { display: none; }
 .modal-title {
   font-family: var(--font-display);
   font-size: 1.15rem;
@@ -646,6 +683,31 @@ onUnmounted(() => {
   color: var(--ink);
   margin: 0 0 18px;
 }
+.autocomplete-wrap { position: relative; }
+.ac-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--cream);
+  border: 1.5px solid var(--leaf);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  margin: 0; padding: 4px 0;
+  list-style: none;
+  max-height: 180px;
+  overflow-y: auto;
+}
+.ac-dropdown li {
+  padding: 11px 16px;
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ac-dropdown li:hover { background: var(--sage-pale); }
+
 .field-group { margin-bottom: 14px; }
 .field-row { display: flex; gap: 10px; }
 .field-group--half { flex: 1; min-width: 0; }
@@ -733,12 +795,12 @@ onUnmounted(() => {
 .item-enter-from { opacity: 0; transform: translateX(-10px); }
 .item-leave-to { opacity: 0; transform: translateX(10px); height: 0; margin: 0; padding: 0; }
 
-.modal-enter-active, .modal-leave-active { transition: opacity 0.22s ease; }
-.modal-enter-active .modal-sheet, .modal-leave-active .modal-sheet { transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
+.modal-enter-active .modal-sheet, .modal-leave-active .modal-sheet { transition: transform 0.2s ease, opacity 0.2s ease; }
 .modal-enter-from { opacity: 0; }
-.modal-enter-from .modal-sheet { transform: translateY(100%); }
+.modal-enter-from .modal-sheet { transform: scale(0.95); opacity: 0; }
 .modal-leave-to { opacity: 0; }
-.modal-leave-to .modal-sheet { transform: translateY(100%); }
+.modal-leave-to .modal-sheet { transform: scale(0.95); opacity: 0; }
 
 .toast-enter-active, .toast-leave-active { transition: all 0.22s ease; }
 .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(-50%) translateY(10px); }

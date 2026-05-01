@@ -16,8 +16,11 @@ const router = createRouter({
   routes
 })
 
+const isDraftPreview = window.location.hostname.includes('--') && window.location.hostname.includes('netlify.app')
+
 router.beforeEach((to) => {
   if (to.meta.public) return true
+  if (isDraftPreview) return true
   if (!user.value)    return '/login'
   return true
 })

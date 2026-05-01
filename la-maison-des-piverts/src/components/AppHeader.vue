@@ -12,6 +12,12 @@
       </div>
       <div class="header-actions">
         <slot />
+        <button v-if="user" class="btn-header-icon" @click="notifOuverte = true" title="Notifications de péremption">
+          🔔
+        </button>
+        <button class="btn-header-icon" @click="toggleTheme" :title="isDark ? 'Mode clair' : 'Mode sombre'">
+          {{ isDark ? '☀️' : '🌙' }}
+        </button>
         <button v-if="user" class="btn-signout" @click="deconnecter" title="Se déconnecter">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
@@ -21,6 +27,8 @@
         </button>
       </div>
     </div>
+
+    <NotifPanel :ouvert="notifOuverte" @close="notifOuverte = false" />
     <div class="header-wave">
       <svg viewBox="0 0 1440 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M0,20 C360,40 1080,0 1440,20 L1440,40 L0,40 Z" fill="var(--parchment)" />
@@ -30,14 +38,19 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { signOut, user } from '../composables/useAuth.js'
+import { useTheme } from '../composables/useTheme.js'
+import NotifPanel from './NotifPanel.vue'
 
 defineProps({
   subtitle: { type: String, default: '' }
 })
 
 const router = useRouter()
+const { isDark, toggleTheme } = useTheme()
+const notifOuverte = ref(false)
 
 async function deconnecter() {
   await signOut()
@@ -148,6 +161,7 @@ async function deconnecter() {
   height: 100%;
 }
 
+.btn-header-icon,
 .btn-signout {
   width: 34px;
   height: 34px;
@@ -161,7 +175,9 @@ async function deconnecter() {
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
+  font-size: 1rem;
 }
+.btn-header-icon:hover,
 .btn-signout:hover {
   background: rgba(255,255,255,0.18);
   color: white;

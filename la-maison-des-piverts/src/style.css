@@ -82,6 +82,29 @@ body::before {
   z-index: 1;
 }
 
+/* ── Mode sombre ─────────────────────────────────────────── */
+[data-theme="dark"] {
+  --parchment:    #141a13;
+  --cream:        #1b231a;
+  --sand:         #232d22;
+  --sand-light:   #2b362a;
+  --ink:          #dde9d8;
+  --stone:        #96aa92;
+  --stone-light:  #677863;
+  --sage-pale:    rgba(97, 140, 87, 0.18);
+  --danger-pale:  rgba(184, 60, 60, 0.15);
+
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 14px 40px rgba(0, 0, 0, 0.6);
+  --shadow-fab: 0 8px 28px rgba(0, 0, 0, 0.7);
+}
+
+html, body {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
 /* ── Utilitaires globaux ──────────────────────────────────── */
 .display {
   font-family: var(--font-display);

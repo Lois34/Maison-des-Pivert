@@ -4,10 +4,15 @@
     <!-- Header -->
     <div class="recettes-topbar">
       <h2 class="recettes-heading">Recettes</h2>
-      <button class="btn-suggerer" :disabled="loadingIA" @click="ouvrirWizard">
-        <span v-if="loadingIA" class="btn-suggerer-spinner">{{ iaEmoji }}</span>
-        <span v-else>✨ Suggérer</span>
-      </button>
+      <div class="topbar-ia-btns">
+        <button class="btn-dicter" :disabled="loadingIA" @click="demarrerDictee" title="Dicter une recette">
+          🎤
+        </button>
+        <button class="btn-suggerer" :disabled="loadingIA" @click="ouvrirWizard">
+          <span v-if="loadingIA" class="btn-suggerer-spinner">{{ iaEmoji }}</span>
+          <span v-else>✨ Suggérer</span>
+        </button>
+      </div>
     </div>
 
     <!-- Skeleton -->
@@ -49,7 +54,7 @@
     <!-- ══════════ MODAL WIZARD IA ══════════ -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="wizardOuvert" class="modal-overlay" @click.self="fermerWizard">
+        <div v-if="wizardOuvert" class="modal-overlay" :style="keyboardY ? { bottom: `${keyboardY}px` } : {}" @click.self="fermerWizard">
           <div class="modal-sheet">
             <div class="modal-handle" />
 
@@ -122,11 +127,29 @@
                   placeholder="Ex : Poulet, Pâtes, Saumon…"
                   autocomplete="off"
                   @keydown.enter="genererRecetteIA"
+                  @focus="scrollInputEnVue"
                 />
                 <p class="wizard-hint">Laisse vide si pas de préférence</p>
               </div>
               <button class="btn-generer" @click="genererRecetteIA">✨ Générer ma recette</button>
             </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- ══════════ OVERLAY DICTÉE ══════════ -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="dicteeActive" class="dictee-overlay">
+          <div class="dictee-card">
+            <div class="dictee-micro" :class="{ ecoute: dicteeEcoute }">🎤</div>
+            <p class="dictee-titre">{{ dicteeEcoute ? 'Je vous écoute…' : 'Connexion micro…' }}</p>
+            <div class="dictee-texte">
+              <span v-if="!dicteeTranscrit && !dicteeInterim" class="dictee-hint">Parle maintenant — le texte s'affiche ici</span>
+              <span>{{ dicteeTranscrit }}</span><span class="dictee-interim">{{ dicteeInterim }}</span>
+            </div>
+            <button class="btn-dictee-stop" @click="arreterDictee">✅ Terminer</button>
           </div>
         </div>
       </Transition>
@@ -150,7 +173,7 @@
     <!-- ══════════ MODAL FORMULAIRE ══════════ -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="formOuvert" class="modal-overlay modal-overlay--scroll" @click.self="fermerFormulaire">
+        <div v-if="formOuvert" class="modal-overlay modal-overlay--scroll" :style="keyboardY ? { bottom: `${keyboardY}px` } : {}">
           <div class="modal-sheet modal-sheet--tall">
             <div class="modal-handle" />
             <div class="modal-header-row">
@@ -160,12 +183,12 @@
 
             <div class="field-group">
               <label class="field-label">Nom de la recette *</label>
-              <input ref="inputNom" v-model="form.nom" type="text" class="field-input" placeholder="Ex : Poulet rôti croustillant" />
+              <input ref="inputNom" v-model="form.nom" type="text" class="field-input" placeholder="Ex : Poulet rôti croustillant" @focus="scrollInputEnVue" />
             </div>
 
             <div class="field-group">
               <label class="field-label">Description courte</label>
-              <input v-model="form.description" type="text" class="field-input" placeholder="Ex : Léger et savoureux" />
+              <input v-model="form.description" type="text" class="field-input" placeholder="Ex : Léger et savoureux" @focus="scrollInputEnVue" />
             </div>
 
             <!-- Photo -->
@@ -213,6 +236,10 @@
               </div>
             </div>
 
+            <button v-if="form._ia" class="btn-nouvelle-proposition" @click="nouvelleProposition">
+              🔀 Nouvelle proposition
+            </button>
+
             <div class="modal-actions">
               <button class="btn-cancel" @click="fermerFormulaire">Annuler</button>
               <button class="btn-save" :disabled="sauvegarde" @click="sauvegarder">
@@ -227,7 +254,7 @@
     <!-- ══════════ MODAL DÉTAIL ══════════ -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="detailOuvert && recetteActive" class="modal-overlay modal-overlay--scroll" @click.self="fermerDetail">
+        <div v-if="detailOuvert && recetteActive" class="modal-overlay modal-overlay--scroll">
           <div class="modal-sheet modal-sheet--tall">
             <div class="modal-handle" />
             <button class="wizard-close detail-close" @click="fermerDetail">×</button>
@@ -283,7 +310,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { supabase } from '../services/supabase.js'
 
 // ── Constantes ──
@@ -314,11 +341,11 @@ const ENVIES_SUCRE = [
 const IA_MODELS = [
   'google/gemma-4-31b-it:free',
   'google/gemma-4-26b-a4b-it:free',
-  'deepseek/deepseek-chat-v3-0324:free',
-  'deepseek/deepseek-r1-0528:free',
-  'meta-llama/llama-3.1-8b-instruct:free',
-  'qwen/qwen-2.5-72b-instruct:free',
   'nvidia/nemotron-3-super-120b-a12b:free',
+  'minimax/minimax-m2.5:free',
+  'poolside/laguna-m.1:free',
+  'poolside/laguna-xs.2:free',
+  'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
 ]
 const IA_EMOJIS = ['🍳','🥘','🍗','🥗','🧆','🍜','🥙','🫕']
 
@@ -346,6 +373,13 @@ const IA_MESSAGES    = [
   'Je mijote les idées…',
   'Presque prête…',
 ]
+
+// Dictée
+const dicteeActive    = ref(false)
+const dicteeEcoute    = ref(false)
+const dicteeTranscrit = ref('')
+const dicteeInterim   = ref('')
+let recognitionRef    = null
 
 // Wizard
 const wizardStep      = ref(1)
@@ -496,6 +530,11 @@ function ouvrirFormulaire(recette = null) {
 
 function fermerFormulaire() { formOuvert.value = false }
 
+function nouvelleProposition() {
+  fermerFormulaire()
+  genererRecetteIA()
+}
+
 function ouvrirDetail(recette) {
   recetteActive.value = recette
   detailOuvert.value = true
@@ -507,6 +546,137 @@ function onPhotoChange(e) {
   if (!file) return
   form.value.photoFile = file
   photoLabel.value = '✅ ' + file.name
+}
+
+// ── Dictée vocale ──
+function demarrerDictee() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (!SpeechRec) { afficherToast('❌ Dictée non disponible sur cet appareil'); return }
+  dicteeTranscrit.value = ''
+  dicteeInterim.value = ''
+  dicteeEcoute.value = false
+  dicteeActive.value = true
+
+  const r = new SpeechRec()
+  r.lang = 'fr-FR'
+  r.continuous = true
+  r.interimResults = true
+
+  r.onaudiostart = () => { dicteeEcoute.value = true }
+
+  r.onresult = (e) => {
+    let interim = ''
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) dicteeTranscrit.value += e.results[i][0].transcript + ' '
+      else interim += e.results[i][0].transcript
+    }
+    dicteeInterim.value = interim
+  }
+
+  r.onend = () => {
+    dicteeInterim.value = ''
+    dicteeEcoute.value = false
+    if (dicteeActive.value) {
+      // Redémarre si arrêt inattendu (timeout iOS)
+      try { r.start() } catch {}
+    }
+  }
+
+  r.onerror = (e) => {
+    if (e.error === 'no-speech') return
+    dicteeActive.value = false
+    dicteeEcoute.value = false
+    recognitionRef = null
+    const msgs = {
+      'not-allowed': '❌ Accès au micro refusé. Autorise le micro dans le navigateur.',
+      'network': '❌ Erreur réseau. Vérifie ta connexion.',
+    }
+    afficherToast(msgs[e.error] || `❌ Erreur micro : ${e.error}`)
+  }
+
+  try {
+    r.start()
+    recognitionRef = r
+  } catch (e) {
+    dicteeActive.value = false
+    afficherToast('❌ Impossible de démarrer le micro.')
+  }
+}
+
+function arreterDictee() {
+  dicteeActive.value = false
+  // Récupère aussi les derniers mots pas encore validés
+  if (dicteeInterim.value.trim()) {
+    dicteeTranscrit.value += dicteeInterim.value + ' '
+    dicteeInterim.value = ''
+  }
+  recognitionRef?.stop()
+  recognitionRef = null
+  if (dicteeTranscrit.value.trim()) {
+    formaterDictee()
+  } else {
+    afficherToast('🎤 Rien entendu — réessaie en parlant plus fort.')
+  }
+}
+
+async function formaterDictee() {
+  const texte = dicteeTranscrit.value.trim()
+  dicteeTranscrit.value = ''
+  dicteeInterim.value = ''
+  if (!texte) return
+  iaEmoji.value = '📝'
+  iaMessage.value = 'Je mets en forme ta recette…'
+  loadingIA.value = true
+  let idx = 0
+  iaEmojiTimer.value = setInterval(() => {
+    idx = (idx + 1) % IA_EMOJIS.length; iaEmoji.value = IA_EMOJIS[idx]
+  }, 1800)
+  try {
+    const prompt = `Tu es un assistant culinaire. L'utilisatrice a dicté cette recette :
+
+"${texte}"
+
+Formate-la en JSON valide avec exactement ces champs :
+{
+  "nom": "Nom de la recette",
+  "description": "Courte description appétissante (1 phrase)",
+  "ingredients": "liste des ingrédients avec quantités, un par ligne",
+  "instructions": "étapes numérotées, une par ligne",
+  "cuisson": {
+    "ninja_combi": { "mode": "Air Fry", "temperature": 180, "duree": 25 },
+    "philips": { "mode": "Air Fry", "temperature": 180, "duree": 25 },
+    "ninja_crispi": { "mode": "Air Fry", "temperature": 180, "duree": 25 }
+  }
+}`
+    const messages = [
+      { role: 'system', content: 'Tu es un assistant culinaire. Réponds UNIQUEMENT en JSON valide, sans texte autour, sans balises markdown.' },
+      { role: 'user', content: prompt }
+    ]
+    let recette
+    try {
+      recette = await Promise.any(IA_MODELS.map(m => essayerModele(m, messages)))
+    } catch {
+      throw new Error('Impossible de mettre en forme. Réessaie.')
+    }
+    form.value = {
+      _ia: true, nom: recette.nom || '', description: recette.description || '',
+      ingredients: recette.ingredients || '', instructions: recette.instructions || '',
+      photoFile: null,
+      airfryers: Object.fromEntries(AIRFRYERS.map(af => [af.key, {
+        mode: recette.cuisson?.[af.key]?.mode || '',
+        temperature: recette.cuisson?.[af.key]?.temperature || '',
+        duree: recette.cuisson?.[af.key]?.duree || '',
+      }]))
+    }
+    modeEdition.value = false; idEdition.value = null
+    photoLabel.value = '📷 Prendre ou choisir une photo'
+    formOuvert.value = true
+    afficherToast('✨ Recette mise en forme ! Vérifie et sauvegarde.')
+  } catch (e) {
+    afficherToast('❌ ' + e.message)
+  } finally {
+    clearInterval(iaEmojiTimer.value); loadingIA.value = false
+  }
 }
 
 // ── Wizard ──
@@ -563,6 +733,8 @@ async function genererRecetteIA() {
     if (personnes)          contraintes.push(`- Pour : ${personnes}`)
     if (ingredientPrincipal) contraintes.push(`- Ingrédient principal obligatoire : ${ingredientPrincipal}`)
     contraintes.push(`- Sois original et varié, ne propose pas toujours le même ingrédient principal`)
+    const TOUCHES = ['légèreté','gourmandise','originalité','simplicité','exotisme','réconfort','fraîcheur','saveur fumée']
+    contraintes.push(`- Touche du moment : ${TOUCHES[Math.floor(Math.random() * TOUCHES.length)]}`)
     contraintes.push(`- Utilise tout ou partie de ces ingrédients disponibles : ${listeIngredients}`)
 
     const prompt = `Tu es un assistant culinaire créatif. Propose UNE recette adaptée à l'air fryer.
@@ -583,25 +755,16 @@ Réponds UNIQUEMENT en JSON valide avec exactement ces champs :
   }
 }`
 
-    let recette = null
-    for (const model of IA_MODELS) {
-      try {
-        const res = await fetch('/.netlify/functions/ia-proxy', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }] }),
-        })
-        if (!res.ok) continue
-        const data = await res.json()
-        const raw = data.choices?.[0]?.message?.content || ''
-        const match = raw.match(/\{[\s\S]*\}/)
-        if (!match) continue
-        recette = JSON.parse(match[0])
-        break
-      } catch { continue }
+    const messages = [
+      { role: 'system', content: 'Tu es un assistant culinaire créatif. Réponds UNIQUEMENT en JSON valide, sans texte autour, sans balises markdown.' },
+      { role: 'user', content: prompt }
+    ]
+    let recette
+    try {
+      recette = await Promise.any(IA_MODELS.map(m => essayerModele(m, messages)))
+    } catch {
+      throw new Error('Les serveurs IA gratuits sont surchargés 😅 Réessaie dans 1 à 2 minutes.')
     }
-
-    if (!recette) throw new Error('Les serveurs IA gratuits sont surchargés 😅 Réessaie dans 1 à 2 minutes.')
 
     // Pré-remplir formulaire
     form.value = {
@@ -633,6 +796,32 @@ Réponds UNIQUEMENT en JSON valide avec exactement ces champs :
 }
 
 // ── Utilitaires ──
+function scrollInputEnVue(e) {
+  setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350)
+}
+
+function extraireJSON(raw) {
+  let text = raw.replace(/<think>[\s\S]*?<\/think>/gi, '')
+  text = text.replace(/```(?:json)?\s*([\s\S]*?)```/g, '$1')
+  const match = text.match(/\{[\s\S]*\}/)
+  if (!match) return null
+  try { return JSON.parse(match[0]) } catch { return null }
+}
+
+async function essayerModele(model, messages) {
+  const res = await fetch('/.netlify/functions/ia-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(`${model.split('/')[1]}: HTTP ${res.status} — ${data?.error?.message || data?.error || ''}`)
+  const raw = data.choices?.[0]?.message?.content || ''
+  const recette = extraireJSON(raw)
+  if (!recette) throw new Error(`${model.split('/')[1]}: JSON invalide`)
+  return recette
+}
+
 function afficherToast(msg) {
   toast.value = msg
   clearTimeout(toastTimer.value)
@@ -657,7 +846,20 @@ async function compresserImage(file, maxW, quality) {
   })
 }
 
-onMounted(charger)
+const keyboardY = ref(0)
+let vpHandler = null
+onMounted(() => {
+  charger()
+  if (window.visualViewport) {
+    vpHandler = () => {
+      keyboardY.value = Math.max(0, window.innerHeight - window.visualViewport.height)
+    }
+    window.visualViewport.addEventListener('resize', vpHandler)
+  }
+})
+onUnmounted(() => {
+  if (window.visualViewport && vpHandler) window.visualViewport.removeEventListener('resize', vpHandler)
+})
 </script>
 
 <style scoped>
@@ -681,6 +883,28 @@ onMounted(charger)
   color: var(--ink);
   margin: 0;
 }
+.topbar-ia-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-dicter {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(124,58,237,0.1);
+  border: 1.5px solid rgba(124,58,237,0.3);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-dicter:hover { background: rgba(124,58,237,0.2); }
+.btn-dicter:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .btn-suggerer {
   display: flex;
   align-items: center;
@@ -813,6 +1037,7 @@ onMounted(charger)
   box-shadow: var(--shadow-lg);
   max-height: 92vh;
   overflow-y: auto;
+  position: relative;
 }
 .modal-sheet--tall { max-height: 94vh; }
 
@@ -1023,6 +1248,22 @@ onMounted(charger)
   margin-bottom: 3px;
 }
 
+.btn-nouvelle-proposition {
+  width: 100%;
+  padding: 13px;
+  margin-top: 16px;
+  background: transparent;
+  border: 1.5px solid #7c3aed;
+  border-radius: var(--r-md);
+  color: #7c3aed;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-nouvelle-proposition:hover { background: #f5f0ff; }
+
 /* Actions modal */
 .modal-actions {
   display: flex;
@@ -1062,8 +1303,20 @@ onMounted(charger)
 /* ── Détail ── */
 .detail-close {
   position: absolute;
-  top: 18px;
-  right: 16px;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.15);
+  color: var(--ink);
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
 }
 .detail-img {
   width: 100%;
@@ -1203,6 +1456,76 @@ onMounted(charger)
 
 .toast-enter-active, .toast-leave-active { transition: all 0.22s ease; }
 .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+
+/* ── Overlay Dictée ── */
+.dictee-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(20, 10, 40, 0.88);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.dictee-card {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: var(--r-xl);
+  padding: 32px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+.dictee-micro {
+  font-size: 3rem;
+  animation: pulse-micro 1.8s ease-in-out infinite;
+  filter: grayscale(1) opacity(0.5);
+  transition: filter 0.4s;
+}
+.dictee-micro.ecoute {
+  filter: grayscale(0) opacity(1) drop-shadow(0 0 10px rgba(100,220,100,0.7));
+  animation-duration: 0.9s;
+}
+@keyframes pulse-micro {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+}
+.dictee-titre {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.9);
+  margin: 0;
+}
+.dictee-texte {
+  min-height: 60px;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.6;
+  width: 100%;
+}
+.dictee-hint { color: rgba(255,255,255,0.35); font-style: italic; }
+.dictee-interim { color: rgba(255,255,255,0.45); font-style: italic; }
+.btn-dictee-stop {
+  padding: 13px 32px;
+  background: #7c3aed;
+  border: none;
+  border-radius: var(--r-md);
+  color: white;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 4px;
+}
+.btn-dictee-stop:hover { background: #6d28d9; }
 
 /* ── Loader IA ── */
 .loader-ia-overlay {

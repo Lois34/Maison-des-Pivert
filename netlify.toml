@@ -6,6 +6,15 @@
 [functions.ia-proxy]
   timeout = 20
 
+[functions.ia-vision]
+  timeout = 20
+
+# Headers de sécurité
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; media-src 'self' blob: mediastream:; worker-src 'self' blob:;"
+
 # Vue Router — redirige toutes les routes vers index.html (SPA)
 [[redirects]]
   from = "/*"
