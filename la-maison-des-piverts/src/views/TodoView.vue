@@ -127,6 +127,9 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { supabase } from '../services/supabase.js'
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+
 const todos = ref([])
 const loading = ref(true)
 const modalOuvert = ref(false)
@@ -181,6 +184,7 @@ async function sauvegarder() {
     } else {
       await supabase.from('liste_todo').insert([{ nom, fait: false }])
       afficherToast('✅ Tâche ajoutée !')
+      notifierNouvelleTache(nom)
     }
     fermerModal()
     await charger()
@@ -240,6 +244,26 @@ function appliquerChangement(payload) {
   } else if (payload.eventType === 'DELETE') {
     todos.value = todos.value.filter(t => t.id !== payload.old.id)
   }
+}
+
+// — Notifications push —
+function getDeviceId() {
+  let id = localStorage.getItem('pivert_device_id')
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem('pivert_device_id', id) }
+  return id
+}
+
+function notifierNouvelleTache(nom) {
+  fetch(`${SUPABASE_URL}/functions/v1/notify-courses`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    body: JSON.stringify({
+      nom,
+      device_id: getDeviceId(),
+      titre: '✅ Liste des tâches',
+      corps: `Nouvelle tâche ajoutée : ${nom}`,
+    })
+  }).catch(() => {})
 }
 
 let channel
