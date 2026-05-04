@@ -119,6 +119,9 @@
               <span v-if="badgeItem(item)" class="produit-badge" :class="'produit-badge--' + badgeItem(item).cls">
                 {{ badgeItem(item).label }}
               </span>
+              <button v-if="item.image_url" class="zoom-btn" @click.stop="zoomUrl = item.image_url" aria-label="Voir en plein écran">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              </button>
             </div>
             <div class="produit-card-foot">
               <span class="produit-nom">{{ item.nom }}</span>
@@ -137,8 +140,8 @@
             class="list-item"
             @click="ouvrirModif(item)"
           >
-            <div class="list-item-thumb">
-              <img v-if="item.image_url" :src="item.image_url" loading="lazy" :alt="item.nom" />
+            <div class="list-item-thumb" @click.stop="item.image_url && (zoomUrl = item.image_url)">
+              <img v-if="item.image_url" :src="item.image_url" loading="lazy" :alt="item.nom" class="list-thumb-zoomable" />
               <span v-else>📦</span>
             </div>
             <div class="list-item-body">
@@ -275,6 +278,18 @@
       </Transition>
     </Teleport>
 
+    <!-- Lightbox photo -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div v-if="zoomUrl" class="lightbox-overlay" @click="zoomUrl = null">
+          <button class="lightbox-close" @click="zoomUrl = null">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <img :src="zoomUrl" class="lightbox-img" @click.stop />
+        </div>
+      </Transition>
+    </Teleport>
+
     <!-- Toast -->
     <Transition name="toast">
       <div v-if="toastVisible" class="toast">{{ toastMsg }}</div>
@@ -303,6 +318,7 @@ const toastVisible = ref(false)
 const photoFichier = ref(null)
 const photoLabel = ref('📷 Prendre ou choisir une photo')
 const longPressId = ref(null)
+const zoomUrl = ref(null)
 
 const photoLieuInputRef = ref(null)
 const photoInputRef = ref(null)
@@ -1227,6 +1243,53 @@ onMounted(() => Promise.all([chargerDonnees(), chargerLieuxPhotos()]))
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* ── Zoom btn ──────────────────────────────────────────── */
+.zoom-btn {
+  position: absolute; bottom: 8px; right: 8px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(28, 26, 18, 0.55);
+  border: none;
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  backdrop-filter: blur(4px);
+}
+.produit-card:hover .zoom-btn { opacity: 1; }
+@media (hover: none) { .zoom-btn { opacity: 0.7; } }
+
+.list-thumb-zoomable { cursor: zoom-in; }
+
+/* ── Lightbox ───────────────────────────────────────────── */
+.lightbox-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 4000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  cursor: zoom-out;
+}
+.lightbox-img {
+  max-width: 100%; max-height: 90svh;
+  border-radius: var(--r-md);
+  object-fit: contain;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+.lightbox-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
 
 .toast-enter-active { transition: opacity 0.2s, transform 0.25s cubic-bezier(0.34, 1.2, 0.64, 1); }
 .toast-leave-active { transition: opacity 0.18s, transform 0.18s ease-in; }

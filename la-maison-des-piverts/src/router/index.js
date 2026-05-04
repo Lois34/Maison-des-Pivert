@@ -8,6 +8,7 @@ const routes = [
   { path: '/courses',  component: () => import('../views/CoursesView.vue') },
   { path: '/recettes', component: () => import('../views/RecettesView.vue') },
   { path: '/lessive',  component: () => import('../views/LessiveView.vue') },
+  { path: '/todo',     component: () => import('../views/TodoView.vue') },
   { path: '/login',    component: () => import('../views/LoginView.vue'), meta: { public: true } }
 ]
 
