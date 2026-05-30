@@ -105,11 +105,32 @@ watch(() => props.ouvert, async (val) => {
   if ('serviceWorker' in navigator) {
     try { await navigator.serviceWorker.register('/sw.js') } catch {}
   }
-  if (permission.value === 'granted') verifierPeremptions()
+  if (permission.value === 'granted') {
+    rafraichirAbonnement()
+    verifierPeremptions()
+  }
 })
 
 function sauvegarderSeuil() {
   if (seuil.value > 0) localStorage.setItem(SEUIL_KEY, seuil.value)
+}
+
+// Met à jour silencieusement le device_id de la souscription existante.
+// Corrige le cas où la souscription a été créée avant l'ajout de la colonne device_id.
+async function rafraichirAbonnement() {
+  try {
+    if (!('serviceWorker' in navigator)) return
+    const sw  = await navigator.serviceWorker.ready
+    const sub = await sw.pushManager.getSubscription()
+    if (!sub) return
+    const { endpoint, keys } = sub.toJSON()
+    let device_id = localStorage.getItem('pivert_device_id')
+    if (!device_id) { device_id = crypto.randomUUID(); localStorage.setItem('pivert_device_id', device_id) }
+    await supabase.from('push_subscriptions').upsert(
+      { endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id },
+      { onConflict: 'endpoint' }
+    )
+  } catch {}
 }
 
 function urlBase64ToUint8Array(base64) {

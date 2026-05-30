@@ -27,10 +27,14 @@ Deno.serve(async (req: Request) => {
 
   let nom: string
   let caller_device_id: string | undefined
+  let titre_custom: string | undefined
+  let corps_custom: string | undefined
   try {
     const body = await req.json()
     nom = body.nom
     caller_device_id = body.device_id
+    titre_custom = body.titre
+    corps_custom = body.corps
   } catch {
     return new Response(JSON.stringify({ error: 'JSON invalide' }), {
       status: 400,
@@ -74,8 +78,8 @@ Deno.serve(async (req: Request) => {
   )
 
   const payload = JSON.stringify({
-    title: '🛒 Liste de courses',
-    body: `Nouvel article ajouté : ${nom}`,
+    title: titre_custom ?? '🛒 Liste de courses',
+    body:  corps_custom ?? `Nouvel article ajouté : ${nom}`,
     icon: '/pivert.png',
     tag: 'courses-pivert',
   })
