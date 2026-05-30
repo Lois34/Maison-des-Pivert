@@ -11,16 +11,16 @@ self.addEventListener('activate', function(event) {
 
 // Reçoit les push envoyés par la Edge Function Supabase
 self.addEventListener('push', function(event) {
-  let data = { title: '⚠️ Péremption', body: 'Des objets sont à vérifier.' };
-  try { data = event.data.json(); } catch(e) {}
+  let data = { title: '⚠️ Péremption', body: 'Des objets sont à vérifier.', tag: 'peremption-pivert' };
+  try { data = Object.assign(data, event.data.json()); } catch(e) {}
 
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: './pivert.png',
       badge: './pivert.png',
-      tag: 'peremption-pivert',
-      renotify: true,
+      tag: data.tag,
+      renotify: false,
       vibrate: [200, 100, 200]
     })
   );
