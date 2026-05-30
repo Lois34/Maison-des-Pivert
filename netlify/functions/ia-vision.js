@@ -1,13 +1,29 @@
+const { getAuthenticatedFoyer, checkQuota, incrementQuota, reponse429 } = require('./_auth')
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' }
   }
 
+  // 1. Authentification JWT → foyer_id sécurisé côté serveur
+  const auth = await getAuthenticatedFoyer(event)
+  if (auth.error) {
+    return {
+      statusCode: auth.status,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: auth.error })
+    }
+  }
+
+  // 2. Vérifier le quota avant tout appel IA
+  const quota = await checkQuota(auth.foyerId, 'vision', auth.token)
+  if (!quota.ok) return reponse429(quota, 'scans IA')
+
   const { image, prompt } = JSON.parse(event.body)
-  const geminiKey = process.env.GEMINI_API_KEY
+  const geminiKey     = process.env.GEMINI_API_KEY
   const openrouterKey = process.env.OPENROUTER_KEY
 
-  // 1. Gemini 2.5 Flash en priorité
+  // 3a. Gemini 2.5 Flash en priorité
   if (geminiKey) {
     try {
       const controller = new AbortController()
@@ -34,17 +50,20 @@ exports.handler = async (event) => {
       if (res.ok) {
         const data = await res.json()
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text
-        if (text) return {
-          statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ result: text })
+        if (text) {
+          // 3. Incrémenter uniquement si l'appel IA a réussi
+          await incrementQuota('vision', auth.token)
+          return {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ result: text })
+          }
         }
       }
-      // 429 quota ou autre erreur → bascule OpenRouter
     } catch {}
   }
 
-  // 2. Fallback OpenRouter
+  // 3b. Fallback OpenRouter
   if (openrouterKey) {
     const MODELS = ['meta-llama/llama-4-scout', 'meta-llama/llama-4-maverick', 'google/gemini-2.5-flash-preview']
     for (const model of MODELS) {
@@ -76,10 +95,14 @@ exports.handler = async (event) => {
         if (res.ok) {
           const data = await res.json()
           const text = data.choices?.[0]?.message?.content
-          if (text) return {
-            statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ result: text })
+          if (text) {
+            // Incrémenter uniquement si l'appel IA a réussi
+            await incrementQuota('vision', auth.token)
+            return {
+              statusCode: 200,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ result: text })
+            }
           }
         }
       } catch {}

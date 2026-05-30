@@ -312,6 +312,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { supabase } from '../services/supabase.js'
+import { profile } from '../composables/useAuth.js'
 
 // ── Constantes ──
 const AIRFRYERS = [
@@ -455,6 +456,7 @@ async function sauvegarder() {
       instructions: form.value.instructions.trim() || null,
       image_url,
       cuisson,
+      foyer_id: profile.value.foyer_id,
     }
 
     if (modeEdition.value) {
@@ -654,8 +656,12 @@ Formate-la en JSON valide avec exactement ces champs :
     ]
     let recette
     try {
-      recette = await Promise.any(IA_MODELS.map(m => essayerModele(m, messages)))
-    } catch {
+      const token = await getToken()
+      recette = await Promise.any(IA_MODELS.map(m => essayerModele(m, messages, token)))
+    } catch (e) {
+      const errors = e instanceof AggregateError ? e.errors : [e]
+      const quotaErr = errors.find(err => err.code === 'QUOTA_DEPASSE')
+      if (quotaErr) throw quotaErr
       throw new Error('Impossible de mettre en forme. Réessaie.')
     }
     form.value = {
@@ -761,8 +767,12 @@ Réponds UNIQUEMENT en JSON valide avec exactement ces champs :
     ]
     let recette
     try {
-      recette = await Promise.any(IA_MODELS.map(m => essayerModele(m, messages)))
-    } catch {
+      const token = await getToken()
+      recette = await Promise.any(IA_MODELS.map(m => essayerModele(m, messages, token)))
+    } catch (e) {
+      const errors = e instanceof AggregateError ? e.errors : [e]
+      const quotaErr = errors.find(err => err.code === 'QUOTA_DEPASSE')
+      if (quotaErr) throw quotaErr
       throw new Error('Les serveurs IA gratuits sont surchargés 😅 Réessaie dans 1 à 2 minutes.')
     }
 
@@ -808,12 +818,22 @@ function extraireJSON(raw) {
   try { return JSON.parse(match[0]) } catch { return null }
 }
 
-async function essayerModele(model, messages) {
+async function getToken() {
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.access_token || ''
+}
+async function essayerModele(model, messages, token) {
   const res = await fetch('/.netlify/functions/ia-proxy', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages }),
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ type: 'recette', model, messages }),
   })
+  if (res.status === 429) {
+    const data = await res.json()
+    const err = new Error(data.message || 'Quota mensuel de recettes atteint')
+    err.code = 'QUOTA_DEPASSE'
+    throw err
+  }
   const data = await res.json()
   if (!res.ok) throw new Error(`${model.split('/')[1]}: HTTP ${res.status} — ${data?.error?.message || data?.error || ''}`)
   const raw = data.choices?.[0]?.message?.content || ''

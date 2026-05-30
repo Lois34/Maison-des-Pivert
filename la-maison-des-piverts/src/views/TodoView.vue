@@ -126,6 +126,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { supabase } from '../services/supabase.js'
+import { profile } from '../composables/useAuth.js'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -182,7 +183,7 @@ async function sauvegarder() {
       await supabase.from('liste_todo').update({ nom }).eq('id', idEdition.value)
       afficherToast('✅ Tâche modifiée !')
     } else {
-      await supabase.from('liste_todo').insert([{ nom, fait: false }])
+      await supabase.from('liste_todo').insert([{ nom, fait: false, foyer_id: profile.value.foyer_id }])
       afficherToast('✅ Tâche ajoutée !')
       notifierNouvelleTache(nom)
     }

@@ -19,7 +19,7 @@ import AppHeader from './components/AppHeader.vue'
 import BottomNav from './components/BottomNav.vue'
 
 const route = useRoute()
-const isPublicRoute = computed(() => !!route.meta.public)
+const isPublicRoute = computed(() => !!route.meta.public || !!route.meta.noNav)
 
 const count = ref(null)
 const headerSubtitle = ref('')

@@ -180,6 +180,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { supabase } from '../services/supabase.js'
+import { profile } from '../composables/useAuth.js'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -279,7 +280,7 @@ async function sauvegarder() {
       await supabase.from('liste_courses').update(payload).eq('id', idEdition.value)
       afficherToast('✅ Article modifié !')
     } else {
-      await supabase.from('liste_courses').insert([{ ...payload, achete: false }])
+      await supabase.from('liste_courses').insert([{ ...payload, achete: false, foyer_id: profile.value.foyer_id }])
       afficherToast('✅ Article ajouté !')
       notifierNouvelArticle(nom)
     }

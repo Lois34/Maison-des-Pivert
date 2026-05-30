@@ -300,6 +300,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../services/supabase.js'
+import { profile } from '../composables/useAuth.js'
 
 const emit = defineEmits(['update-count'])
 
@@ -487,7 +488,7 @@ async function sauvegarder() {
       await supabase.storage.from('photos').upload(name, compressed, { contentType: 'image/jpeg' })
       imageUrl = supabase.storage.from('photos').getPublicUrl(name).data.publicUrl
     }
-    const donnees = { nom: form.value.nom, lieu: form.value.lieu, sous_lieu: form.value.sous_lieu, date_peremption: form.value.date_peremption || null, quantite: form.value.quantite || 1 }
+    const donnees = { nom: form.value.nom, lieu: form.value.lieu, sous_lieu: form.value.sous_lieu, date_peremption: form.value.date_peremption || null, quantite: form.value.quantite || 1, foyer_id: profile.value.foyer_id }
     if (imageUrl) donnees.image_url = imageUrl
     if (form.value.id) {
       await supabase.from('inventaire').update(donnees).eq('id', form.value.id)
@@ -515,7 +516,7 @@ async function supprimer(id, nom) {
 async function supprimerDepuisModal() { fermerModal(); await supprimer(form.value.id, form.value.nom) }
 async function ajouterDepuisInventaire() {
   if (!form.value.nom) return
-  await supabase.from('liste_courses').insert([{ nom: form.value.nom, quantite: 1 }])
+  await supabase.from('liste_courses').insert([{ nom: form.value.nom, quantite: 1, foyer_id: profile.value.foyer_id }])
   showToast('🛒 Ajouté aux courses')
 }
 
@@ -543,7 +544,7 @@ async function uploaderPhotoLieu(e) {
   const name = `lieu_${Date.now()}.jpg`
   await supabase.storage.from('photos').upload(name, compressed, { contentType: 'image/jpeg' })
   const url = supabase.storage.from('photos').getPublicUrl(name).data.publicUrl
-  await supabase.from('lieux_photos').upsert([{ lieu: lieu.toUpperCase(), sous_lieu: souslieu || '', photo_url: url }], { onConflict: 'lieu,sous_lieu' })
+  await supabase.from('lieux_photos').upsert([{ foyer_id: profile.value.foyer_id, lieu: lieu.toUpperCase(), sous_lieu: souslieu || '', photo_url: url }], { onConflict: 'foyer_id,lieu,sous_lieu' })
   lieuxPhotos.value = { ...lieuxPhotos.value, [lieu.toUpperCase() + '|' + (souslieu || '')]: url }
   showToast('📷 Photo mise à jour')
 }
@@ -563,13 +564,23 @@ async function fileToBase64(file) {
     img.src = url
   })
 }
+async function getToken() {
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.access_token || ''
+}
 async function appelVisionIA(base64, prompt) {
   try {
+    const token = await getToken()
     const res = await fetch('/.netlify/functions/ia-vision', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ image: base64, prompt })
     })
+    if (res.status === 429) {
+      const data = await res.json()
+      showToast('🌿 ' + (data.message || 'Quota mensuel de scans atteint'))
+      return null
+    }
     const data = await res.json()
     if (res.ok && data.result) return data.result
   } catch {}
@@ -592,10 +603,12 @@ async function suggererNomAvecIA(e) {
 }
 async function appelVisionOpenRouter(base64, prompt) {
   try {
+    const token = await getToken()
     const res = await fetch('/.netlify/functions/ia-proxy', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({
+        type: 'vision',
         model: 'meta-llama/llama-4-scout',
         messages: [{ role: 'user', content: [
           { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64}` } },
@@ -603,6 +616,11 @@ async function appelVisionOpenRouter(base64, prompt) {
         ]}]
       })
     })
+    if (res.status === 429) {
+      const data = await res.json()
+      showToast('🌿 ' + (data.message || 'Quota mensuel de scans atteint'))
+      return null
+    }
     const data = await res.json()
     if (res.ok && data.choices?.[0]?.message?.content) return data.choices[0].message.content
   } catch {}
