@@ -74,6 +74,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { supabase } from '../services/supabase.js'
+import { profile } from '../composables/useAuth.js'
 
 const props = defineProps({ ouvert: Boolean })
 const emit  = defineEmits(['close'])
@@ -127,7 +128,7 @@ async function rafraichirAbonnement() {
     let device_id = localStorage.getItem('pivert_device_id')
     if (!device_id) { device_id = crypto.randomUUID(); localStorage.setItem('pivert_device_id', device_id) }
     await supabase.from('push_subscriptions').upsert(
-      { endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id },
+      { endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id, foyer_id: profile.value?.foyer_id },
       { onConflict: 'endpoint' }
     )
   } catch {}
@@ -159,7 +160,7 @@ async function activerNotifications() {
     let device_id = localStorage.getItem('pivert_device_id')
     if (!device_id) { device_id = crypto.randomUUID(); localStorage.setItem('pivert_device_id', device_id) }
     await supabase.from('push_subscriptions').upsert(
-      { endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id },
+      { endpoint, p256dh: keys.p256dh, auth: keys.auth, device_id, foyer_id: profile.value?.foyer_id },
       { onConflict: 'endpoint' }
     )
     await verifierPeremptions()
