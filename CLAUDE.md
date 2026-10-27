@@ -66,7 +66,7 @@ AppPivert/
 
 ## Environment Variables
 
-`la-maison-des-piverts/.env` (committed):
+`la-maison-des-piverts/.env` (local only, not committed — recreate it on a new machine):
 ```
 VITE_SUPABASE_URL=https://flrwnvtruxmrofamkegy.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_...
