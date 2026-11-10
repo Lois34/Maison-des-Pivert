@@ -51,9 +51,36 @@ Deno.serve(async (req: Request) => {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
+  // Foyer de l'expéditeur : d'abord via son compte (JWT utilisateur)…
+  let foyer_id: string | null = null
+  const token = req.headers.get('Authorization')?.replace('Bearer ', '')
+  if (token) {
+    const { data: { user } } = await supabase.auth.getUser(token)
+    if (user) {
+      const { data: prof } = await supabase.from('profiles').select('foyer_id').eq('id', user.id).single()
+      foyer_id = prof?.foyer_id ?? null
+    }
+  }
+  // …sinon via l'abonnement de son appareil (ancien frontend qui envoie la clé anon)
+  if (!foyer_id && caller_device_id) {
+    const { data: own } = await supabase
+      .from('push_subscriptions')
+      .select('foyer_id')
+      .eq('device_id', caller_device_id)
+      .limit(1)
+    foyer_id = own?.[0]?.foyer_id ?? null
+  }
+
+  if (!foyer_id) {
+    return new Response(JSON.stringify({ sent: 0, message: 'Foyer inconnu' }), {
+      headers: { ...CORS, 'Content-Type': 'application/json' },
+    })
+  }
+
   const { data: subscriptions } = await supabase
     .from('push_subscriptions')
     .select('endpoint, p256dh, auth, device_id')
+    .eq('foyer_id', foyer_id)
 
   if (!subscriptions || subscriptions.length === 0) {
     return new Response(JSON.stringify({ sent: 0, message: 'Aucun abonné' }), {

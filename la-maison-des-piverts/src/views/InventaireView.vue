@@ -190,7 +190,7 @@
                 <label>Nom de l'objet</label>
                 <div class="field-row">
                   <div class="autocomplete-wrap" style="flex:1">
-                    <input v-model="form.nom" type="text" placeholder="Ex : Perceuse" autocomplete="off"
+                    <input ref="nomInputRef" v-model="form.nom" type="text" placeholder="Ex : Perceuse" autocomplete="off"
                       @focus="acFocus='nom'" @blur="acBlur('nom')" />
                     <ul v-if="acFocus==='nom' && acNoms.length" class="ac-dropdown">
                       <li v-for="n in acNoms" :key="n" @mousedown.prevent="form.nom=n; acFocus=null">{{ n }}</li>
@@ -298,7 +298,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { supabase } from '../services/supabase.js'
 import { profile } from '../composables/useAuth.js'
 
@@ -324,6 +324,7 @@ const zoomUrl = ref(null)
 const photoLieuInputRef = ref(null)
 const photoInputRef = ref(null)
 const iaPhotoNomRef = ref(null)
+const nomInputRef = ref(null)
 const iaPhotoDateRef = ref(null)
 let photoLieuCourant = { lieu: '', souslieu: '' }
 let longPressTimer = null
@@ -462,6 +463,7 @@ function nouveauProduit() {
   photoFichier.value = null
   photoLabel.value = '📷 Prendre ou choisir une photo'
   modalOuvert.value = true
+  nextTick(() => nomInputRef.value?.focus())
 }
 function ouvrirModif(item) {
   if (longPressTriggered) { longPressTriggered = false; return }

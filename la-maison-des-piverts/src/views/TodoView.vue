@@ -254,10 +254,12 @@ function getDeviceId() {
   return id
 }
 
-function notifierNouvelleTache(nom) {
+async function notifierNouvelleTache(nom) {
+  const { data } = await supabase.auth.getSession()
+  const token = data.session?.access_token ?? SUPABASE_KEY
   fetch(`${SUPABASE_URL}/functions/v1/notify-courses`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({
       nom,
       device_id: getDeviceId(),
