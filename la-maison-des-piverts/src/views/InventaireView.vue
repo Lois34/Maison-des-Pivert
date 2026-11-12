@@ -81,6 +81,13 @@
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
             </button>
           </div>
+          <div v-if="countSansSousLieu() > 0" class="zone-card" @click="filtrerParSousLieu('__none__')">
+            <div class="zone-card-visual"><span class="zone-emoji">📦</span></div>
+            <div class="zone-card-body">
+              <span class="zone-name">Sans sous-lieu</span>
+              <span class="zone-badge">{{ countSansSousLieu() }}</span>
+            </div>
+          </div>
         </div>
       </template>
 
@@ -380,7 +387,9 @@ const produitsFiltres = computed(() => {
   let data = inventaire.value
   if (recherche.value) data = data.filter(i => norm(i.nom).includes(norm(recherche.value)))
   if (filtreZone.value) data = data.filter(i => i.lieu.toUpperCase() === filtreZone.value)
-  if (filtreSousLieu.value && filtreSousLieu.value !== '__all__')
+  if (filtreSousLieu.value === '__none__')
+    data = data.filter(i => !i.sous_lieu?.trim())
+  else if (filtreSousLieu.value && filtreSousLieu.value !== '__all__')
     data = data.filter(i => i.sous_lieu?.toLowerCase() === filtreSousLieu.value.toLowerCase())
   return data
 })
@@ -390,6 +399,9 @@ const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : ''
 
 function countZone(zone) {
   return inventaire.value.filter(i => i.lieu.toUpperCase() === zone.toUpperCase()).length
+}
+function countSansSousLieu() {
+  return inventaire.value.filter(i => i.lieu.toUpperCase() === filtreZone.value && !i.sous_lieu?.trim()).length
 }
 function countSousLieu(sl) {
   return inventaire.value.filter(i => i.lieu.toUpperCase() === filtreZone.value && i.sous_lieu === sl).length
@@ -458,7 +470,7 @@ function filtrerParSousLieu(sl) { filtreSousLieu.value = sl }
 // ── Modal ─────────────────────────────────────────────────────────────────────
 function nouveauProduit() {
   const lieu = filtreZone.value ? cap(filtreZone.value) : ''
-  const sous = filtreSousLieu.value && filtreSousLieu.value !== '__all__' ? filtreSousLieu.value : ''
+  const sous = filtreSousLieu.value && !['__all__', '__none__'].includes(filtreSousLieu.value) ? filtreSousLieu.value : ''
   form.value = { id: null, nom: '', lieu, sous_lieu: sous, date_peremption: '', quantite: 1 }
   photoFichier.value = null
   photoLabel.value = '📷 Prendre ou choisir une photo'
@@ -593,10 +605,11 @@ async function suggererNomAvecIA(e) {
   iaLoading.value = true
   try {
     const base64 = await fileToBase64(file)
-    const r = await appelVisionIA(base64, 'Donne le nom générique du produit visible sur la photo (pas la marque, pas le fabricant). Exemples : "Lait", "Shampooing", "Pâtes", "Yaourt nature". Première lettre en majuscule, reste en minuscules. Aucun point, aucune ponctuation. Un seul mot ou groupe de mots très court.')
+    const r = await appelVisionIA(base64, 'Donne le nom précis du produit visible sur la photo, tel qu\'on le noterait dans l\'inventaire d\'une maison pour le distinguer des produits du même type. Utilise le nom de la variété ou de la marque quand c\'est lui qui désigne le produit. Exemples : "Leerdammer", "Comté", "Ricoré", "Lait demi-écrémé", "Pâtes penne", "Shampooing Ushuaïa", "Yaourt nature". Jamais un nom trop vague comme "Fromage" ou "Boisson". De 1 à 4 mots, première lettre en majuscule. Aucun point, aucune ponctuation, aucune phrase.')
     if (r) {
-      let nom = r.trim().replace(/[.!?,;:]+$/, '')
-      nom = nom.charAt(0).toUpperCase() + nom.slice(1).toLowerCase()
+      let nom = r.trim().replace(/[.!?,;:"«»]+/g, '')
+      if (nom === nom.toUpperCase()) nom = nom.toLowerCase() // réponse tout en majuscules
+      nom = nom.charAt(0).toUpperCase() + nom.slice(1)
       form.value.nom = nom
     }
     photoFichier.value = file
