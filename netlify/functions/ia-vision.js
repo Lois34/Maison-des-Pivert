@@ -23,7 +23,7 @@ exports.handler = async (event) => {
   const geminiKey     = process.env.GEMINI_API_KEY
   const openrouterKey = process.env.OPENROUTER_KEY
 
-  // 3a. Gemini 2.5 Flash en priorité
+  // 3a. Gemini 3.5 Flash-Lite en priorité (remplace 2.5 Flash, retiré le 01/12/2026)
   if (geminiKey) {
     try {
       const controller = new AbortController()
@@ -31,7 +31,7 @@ exports.handler = async (event) => {
       let res
       try {
         res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${geminiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -121,7 +121,8 @@ async function envoyerCode() {
   try {
     const { error } = await supabase.auth.signInWithOtp({
       email: addr,
-      options: { shouldCreateUser: true },
+      // Inscription sur invitation : seuls les comptes déjà créés reçoivent un code
+      options: { shouldCreateUser: false },
     })
     if (error) throw error
     etape.value = 'otp'
@@ -129,7 +130,10 @@ async function envoyerCode() {
     lancerCooldown()
     nextTick(() => otpRefs.value[0]?.focus())
   } catch (e) {
-    erreur.value = e.message || 'Erreur lors de l\'envoi du code.'
+    const nonInvite = ['otp_disabled', 'signup_disabled'].includes(e.code) || /signups not allowed/i.test(e.message || '')
+    erreur.value = nonInvite
+      ? "Cette adresse n'a pas encore été invitée. Demande une invitation à la personne qui t'a parlé de l'appli."
+      : e.message || 'Erreur lors de l\'envoi du code.'
   } finally {
     loading.value = false
   }

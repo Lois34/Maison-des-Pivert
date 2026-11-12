@@ -5,7 +5,7 @@
 const SUPABASE_URL  = process.env.VITE_SUPABASE_URL
 const SUPABASE_ANON = process.env.VITE_SUPABASE_ANON_KEY
 
-const MAX_VISION   = 50
+const MAX_VISION   = 150
 const MAX_RECETTES = 20
 
 // ── 1. Vérifier le JWT et retourner le foyer_id ──────────────────────────────
